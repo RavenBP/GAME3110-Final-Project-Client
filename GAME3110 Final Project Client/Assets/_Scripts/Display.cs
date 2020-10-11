@@ -20,7 +20,7 @@ public class Display : MonoBehaviour
     private GameObject letterPrefab;
 
     public Guess guess;
-    string[] wordList
+    string[] wordList;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +31,7 @@ public class Display : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach (int index in charToIndexDict[guess.guess])
+        foreach (int index in charToIndexDict[char.ToUpper(guess.guess)])
         {
             solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
         }
