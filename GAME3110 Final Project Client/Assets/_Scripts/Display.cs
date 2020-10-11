@@ -6,7 +6,7 @@ using TMPro;
 public class Display : MonoBehaviour
 {
     public Dictionary<char, List<int>> charToIndexDict; // Maps letters to location in phrase using indices
-    private string alphabet = "abcdefghijklmnopqrstuvwxyz "; // Alphabet + White space
+    private string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
     public string originalPhrase;
     private char[] solution;
@@ -20,6 +20,7 @@ public class Display : MonoBehaviour
     private GameObject letterPrefab;
 
     public Guess guess;
+    string[] wordList
 
     // Start is called before the first frame update
     void Start()
@@ -51,7 +52,10 @@ public class Display : MonoBehaviour
         InitPanelLayout();
         PresentPanel();
 
-
+        foreach (GameObject panel in solutionPanels)
+        {
+            Debug.Log("After " + panel.GetComponentInChildren<TextMeshProUGUI>().text);
+        }
 
         // Init dictionary
         foreach (char letter in alphabet)
@@ -59,17 +63,25 @@ public class Display : MonoBehaviour
             charToIndexDict[letter] = new List<int>();
         }
 
-        for (int i = 0; i < originalPhrase.Length; i++)
+        wordList = originalPhrase.Split();
+        string noSpaces = "";
+
+        foreach (string word in wordList)
+        {
+            noSpaces += word;
+        }
+        
+        for (int i = 0; i < noSpaces.Length; i++)
         {
             // Find the dictionary entry and add the index
             // The key is the alphabet
-            charToIndexDict[originalPhrase[i]].Add(i);
+            charToIndexDict[noSpaces[i]].Add(i);
         }
     }
 
     void InitPanelLayout()
     {
-        string[] wordList = originalPhrase.Split();
+        wordList = originalPhrase.Split();
         List<List<GameObject>> wordPanels = new List<List<GameObject>>();
 
         // Init Panels
@@ -113,10 +125,10 @@ public class Display : MonoBehaviour
 
         //foreach (List<GameObject> wordPanel in wordPanels)
         //{
-        //    foreach (GameObject panel in wordPanel)
-        //    {
-        //        Debug.Log(panel.GetComponent<TextMeshProUGUI>().text);
-        //    }
+            foreach (GameObject panel in solutionPanels)
+            {
+                Debug.Log("Before " + panel.GetComponentInChildren<TextMeshProUGUI>().text);
+            }
         //}
 
         // Format layout for player by adding padding
