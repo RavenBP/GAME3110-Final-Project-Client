@@ -14,8 +14,8 @@ public class Display : MonoBehaviour
     private char[] guesses;
 
     // Panels
-    public List<List<GameObject>> panelLayout; // How to display to players
-    public List<GameObject> solutionPanels; // How the game sees the panels
+    private List<List<GameObject>> panelLayout; // How to display to players
+    private List<GameObject> solutionPanels; // How the game sees the panels
 
     [SerializeField]
     private GameObject letterPrefab;
@@ -40,23 +40,20 @@ public class Display : MonoBehaviour
 
     private void Setup()
     {
-        // Setting up arrays
-        originalPhrase = originalPhrase.ToUpper();
-        alphabet = alphabet.ToUpper();
-
         solution = originalPhrase.ToCharArray();
+
+        // Initializing arrays
         guesses = new char[solution.Length];
         solutionPanels = new List<GameObject>();
         panelLayout = new List<List<GameObject>>();
         charToIndexDict = new Dictionary<char, List<int>>();
 
+        // Convert Lowercase to Uppercase
+        originalPhrase = originalPhrase.ToUpper();
+        alphabet = alphabet.ToUpper();
+
         InitPanelLayout();
         PresentPanel();
-
-        foreach (GameObject panel in solutionPanels)
-        {
-            Debug.Log("After " + panel.GetComponentInChildren<TextMeshProUGUI>().text);
-        }
 
         // Init dictionary
         foreach (char letter in alphabet)
@@ -64,9 +61,9 @@ public class Display : MonoBehaviour
             charToIndexDict[letter] = new List<int>();
         }
 
-        wordList = originalPhrase.Split();
+        // Solution without whitespaces; to keep indices consistent with
+        // panels' indices
         string noSpaces = "";
-
         foreach (string word in wordList)
         {
             noSpaces += word;
@@ -80,12 +77,20 @@ public class Display : MonoBehaviour
         }
     }
 
+    // Init Panels
     void InitPanelLayout()
     {
         wordList = originalPhrase.Split();
         List<List<GameObject>> wordPanels = new List<List<GameObject>>();
 
-        // Init Panels
+        /* Explanation:
+         * Instantiate a new letter panel.  Put this panel into two lists.
+         * One is backend, for the game logic to figure what panel should be turned on/off.
+         * One is frontend, what the user sees, which should be more visually appealing than what the game sees.
+         * 
+         * This works because the panel is the same panel in both Lists (same reference).
+         */
+
         // Create panel references from game logic to onscreen display
         foreach (string word in wordList)
         {
@@ -93,6 +98,7 @@ public class Display : MonoBehaviour
 
             foreach (char letter in word)
             {
+                // Create a panel for the letter
                 GameObject panel = Instantiate(letterPrefab);
                 panel.GetComponentInChildren<TextMeshProUGUI>().text = letter.ToString();
                 panel.GetComponentInChildren<TextMeshProUGUI>().enabled = false;
@@ -110,30 +116,9 @@ public class Display : MonoBehaviour
             wordPanel.Add(blankPanel);
 
             wordPanels.Add(wordPanel); // List of words in panel form
-        }
+        }  
 
-        //foreach (string word in wordList)
-        //{
-        //    Debug.Log(word);
-        //}
-
-        //foreach (List<GameObject> wordPanel in wordPanels)
-        //{
-        //    foreach (GameObject panel in wordPanel)
-        //    {
-        //        Debug.Log(panel.GetComponent<TextMeshProUGUI>().text);
-        //    }
-        //}
-
-        //foreach (List<GameObject> wordPanel in wordPanels)
-        //{
-            foreach (GameObject panel in solutionPanels)
-            {
-                Debug.Log("Before " + panel.GetComponentInChildren<TextMeshProUGUI>().text);
-            }
-        //}
-
-        // Format layout for player by adding padding
+        // Format layout for player by adding padding and word wrap
         int rowCount = 1;
         List<GameObject> panelRow = new List<GameObject>(); // A row of panels in the layout
 
@@ -142,6 +127,7 @@ public class Display : MonoBehaviour
             // Check if row can fit more words
             if (panelRow.Count + wordPanels[i].Count < 15)
             {
+                // Fit as many words as possible in one row.
                 panelRow.AddRange(wordPanels[i]);
             }
             // Row filled - pad the rest of the row
@@ -150,12 +136,11 @@ public class Display : MonoBehaviour
                 PadOutRow(panelRow);
 
                 // Create new row
-                //List<GameObject> copy = new List<GameObject>(panelRow);
                 panelLayout.Add(panelRow);
 
                 rowCount++;
                 panelRow = new List<GameObject>(); // A row of panels in the layout
-                i--; // Go back a step
+                i--; // Go back a step to add the current word to the row
             }
         }
 
@@ -165,14 +150,7 @@ public class Display : MonoBehaviour
         panelLayout.Add(panelRow);
         rowCount++;
 
-        //foreach (List<GameObject> row in panelLayout)
-        //{
-        //    foreach (GameObject panel in row)
-        //    {
-        //        Debug.Log(panel.GetComponent<TextMeshProUGUI>().text);
-        //    }
-        //}
-
+        // Add a blank row above and below the layout to create a border
         for (int i = 0; i < 2; i++)
         {
             panelRow = new List<GameObject>();
@@ -199,6 +177,7 @@ public class Display : MonoBehaviour
 
     void PadOutRow(List<GameObject> panelRow)
     {
+        // These +/-1 is account for the extra white space after the word
         int numPadding = 14 - (panelRow.Count - 1);
         int padLeft = (int)(numPadding * 0.5f) + 1;
         int padRight = numPadding - padLeft;
@@ -222,6 +201,8 @@ public class Display : MonoBehaviour
         }
     }
 
+    // The panels are displayed in the order they are parented
+    // Parent the panels after setting them up
     void PresentPanel()
     {
         foreach (List<GameObject> row in panelLayout)
