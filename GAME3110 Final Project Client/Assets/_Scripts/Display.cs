@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class Display : MonoBehaviour
 {
@@ -105,6 +106,7 @@ public class Display : MonoBehaviour
             // Add a white space to the end of every word
             GameObject blankPanel = Instantiate(letterPrefab);
             blankPanel.GetComponentInChildren<TextMeshProUGUI>().text = " ";
+            blankPanel.GetComponent<Image>().color = Color.green;
             wordPanel.Add(blankPanel);
 
             wordPanels.Add(wordPanel); // List of words in panel form
@@ -179,6 +181,7 @@ public class Display : MonoBehaviour
             {
                 GameObject blankPanel = Instantiate(letterPrefab);
                 blankPanel.GetComponentInChildren<TextMeshProUGUI>().text = "";
+                blankPanel.GetComponent<Image>().color = Color.green;
 
                 panelRow.Add(blankPanel);
             }
@@ -204,6 +207,7 @@ public class Display : MonoBehaviour
         {
             GameObject blankPanel = Instantiate(letterPrefab);
             blankPanel.GetComponentInChildren<TextMeshProUGUI>().text = "";
+            blankPanel.GetComponent<Image>().color = Color.green;
 
             panelRow.Insert(0, blankPanel);
         }
@@ -212,6 +216,7 @@ public class Display : MonoBehaviour
         {
             GameObject blankPanel = Instantiate(letterPrefab);
             blankPanel.GetComponentInChildren<TextMeshProUGUI>().text = "";
+            blankPanel.GetComponent<Image>().color = Color.green;
 
             panelRow.Add(blankPanel);
         }
