@@ -23,6 +23,8 @@ public class Display : MonoBehaviour
     public Guess guess;
     string[] wordList;
 
+    public bool reveal = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,9 +34,18 @@ public class Display : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Test code - need better implementation
         foreach (int index in charToIndexDict[char.ToUpper(guess.guess)])
         {
             solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+        }
+
+        if (reveal)
+        {
+            foreach (GameObject panel in solutionPanels)
+            {
+                panel.GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+            }
         }
     }
 
