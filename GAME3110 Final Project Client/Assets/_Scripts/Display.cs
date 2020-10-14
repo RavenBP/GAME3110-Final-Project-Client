@@ -21,6 +21,10 @@ public class Display : MonoBehaviour
     private GameObject letterPrefab;
 
     public Guess guess;
+
+    // Words data
+    public WordBank wordBank = new WordBank();
+
     string[] wordList;
 
     public bool reveal = false;
@@ -29,13 +33,15 @@ public class Display : MonoBehaviour
     void Start()
     {
         Setup();
+        //Debug.Log(wordBank.Words.Length);
     }
 
     // Update is called once per frame
     void Update()
     {
+
         // Test code - need better implementation
-        foreach (int index in charToIndexDict[char.ToUpper(guess.guess)])
+        foreach (int index in charToIndexDict[char.ToUpper(Guess.currentGuess)])
         {
             solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
         }
@@ -51,6 +57,11 @@ public class Display : MonoBehaviour
 
     private void Setup()
     {
+        // Create Words data, choose playing word randomly
+        wordBank._InstantiateWorld();
+        int random = Random.Range(0, wordBank.Words.Length);
+        originalPhrase = wordBank.Words[random];
+
         solution = originalPhrase.ToCharArray();
 
         // Initializing arrays

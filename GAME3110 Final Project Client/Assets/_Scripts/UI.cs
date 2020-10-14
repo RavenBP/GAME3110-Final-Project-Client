@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -56,7 +57,9 @@ public class UI : MonoBehaviour
 
     public void SubmitLetter()
     {
-        Debug.Log("Player entered the letter: " + tmpInputField.text);
+        //Debug.Log("Player entered the letter: " + tmpInputField.text);
+        Guess.currentGuess = (tmpInputField.text.ToCharArray())[0];
+        Debug.Log("Player entered the letter: " + Guess.currentGuess);
     }
 
     public void ViewAccount()

@@ -363,7 +363,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &206473341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,7 +1003,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5242429dcf5fcd4686a0241eea61d5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  originalPhrase: green eggs and ham are delicious
+  originalPhrase: 
+  currentGuessLetter: {fileID: 278554417}
   letterPrefab: {fileID: 650754678436605298, guid: 577fe0888cd00b34d9f3dff3a7585730, type: 3}
   guess: {fileID: 590419744}
   reveal: 0
@@ -1019,7 +1020,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 101dab439e867f8418152bfea94be4b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guess: 97
+  guess: 98
 --- !u!1 &899765009
 GameObject:
   m_ObjectHideFlags: 0
