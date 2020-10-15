@@ -66,9 +66,11 @@ public class Display : MonoBehaviour
                 remainingCorrectLetters.Remove(char.ToUpper(Guess.currentGuess));
                 // Add score when player guesses correctly, add bonus score when player opens whole word
                 score += Score.SINGLEPOINT;
-                if (remainingCorrectLetters.Count <= 0)
+
+                if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
                 {
                     score += Score.WHOLEWORDPOINT;
+                    PlayerInfo.numWins++;
                 }
             }
         }

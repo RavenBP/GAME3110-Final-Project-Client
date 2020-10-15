@@ -9,25 +9,12 @@ public class UI : MonoBehaviour
 {
     public TMP_InputField tmpInputField;
     public GameObject errorText; // NOTE: Would be better to specify that this is a TMP Text object...
-    string username; // TODO: Associate this with a client
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     public void Login()
     {
-        if (username == "test") // TODO: Check to see if a client with this username exists (maybe inside a list?)
+        if (PlayerInfo.username == "test") // TODO: Check to see if a client with this username exists (maybe inside a list?)
         {
             SceneManager.LoadScene("GameScene"); // Load Game Scene
         }
@@ -40,7 +27,7 @@ public class UI : MonoBehaviour
 
     public void EnteredUsername()
     {
-        username = tmpInputField.text;
+        PlayerInfo.username = tmpInputField.text;
         //Debug.Log("The current value of input field is: " + username);
     }
 
