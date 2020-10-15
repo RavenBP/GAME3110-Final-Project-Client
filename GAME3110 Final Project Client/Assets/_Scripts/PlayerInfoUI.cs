@@ -11,11 +11,26 @@ public class PlayerInfoUI : MonoBehaviour
     [SerializeField]
     TMP_Text winsText;
 
+    [SerializeField]
+    TMP_Text levelText;
+
     // Start is called before the first frame update
     void Start()
     {
-        usernameText.text = PlayerInfo.username;
-        winsText.text = PlayerInfo.numWins.ToString();
+        if (usernameText)
+        {
+            usernameText.text = PlayerInfo.username;
+        }
+
+        if (levelText)
+        {
+            levelText.text = PlayerInfo.level.ToString();
+        }
+
+        if (winsText)
+        {
+            winsText.text = PlayerInfo.numWins.ToString();
+        }
     }
 
     // Update is called once per frame

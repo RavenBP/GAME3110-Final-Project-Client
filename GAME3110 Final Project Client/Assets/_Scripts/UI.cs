@@ -16,7 +16,7 @@ public class UI : MonoBehaviour
     {
         if (PlayerInfo.username == "test") // TODO: Check to see if a client with this username exists (maybe inside a list?)
         {
-            SceneManager.LoadScene("GameScene"); // Load Game Scene
+            SceneManager.LoadScene("MainMenuScene"); // Load Game Scene
         }
         else // Display error text
         {
@@ -36,8 +36,6 @@ public class UI : MonoBehaviour
         // Either load a scene or a pop up panel?
     }
 
-
-
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     ///////////////////////////////////// GameScene /////////////////////////////////////
@@ -56,7 +54,7 @@ public class UI : MonoBehaviour
 
     public void Logout()
     {
-        // NOTE: Will likely need to remove all variables associated with the current user...
+        // Reset all user variables here
 
         SceneManager.LoadScene("LoginScene");
     }
@@ -75,9 +73,9 @@ public class UI : MonoBehaviour
         SceneManager.LoadScene("GameScene");
     }
 
-    public void LoadAccountScene() // Also used inside GameScene
+    public void LoadMainMenuScene()
     {
-        SceneManager.LoadScene("AccountScene");
+        SceneManager.LoadScene("MainMenuScene");
     }
 
     ///////////////////////////////////// DEBUG /////////////////////////////////////

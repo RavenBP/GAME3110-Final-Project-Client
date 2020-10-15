@@ -7,7 +7,7 @@ public class PlayerInfo : MonoBehaviour
     public static string username;
     //string password; // Maybe it might be better to just have this stored on the server somewhere?
     public static int numWins = 0; // Number of wins that can be presented to the player in their account info, this could also be used to calculate their level
-    int playerLevel; // This could increase every 100xp for example
+    public static int level = 1; // This could increase every 100xp for example
     int xpRequired = 100; // Amount of xp needed to level up
 
     // Start is called before the first frame update
@@ -31,8 +31,8 @@ public class PlayerInfo : MonoBehaviour
         return xpRequired;
     }
 
-    int GetPlayerLevel()
+    int GetLevel()
     {
-        return playerLevel;
+        return level;
     }
 }
