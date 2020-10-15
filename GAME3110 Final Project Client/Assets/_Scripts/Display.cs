@@ -16,6 +16,8 @@ public class Display : MonoBehaviour
     public TextMeshProUGUI question;
     // Missed Letter show
     public TextMeshProUGUI missedLetters;
+    // Score show
+    public TextMeshProUGUI scores;
 
     // Panels
     private List<List<GameObject>> panelLayout = new List<List<GameObject>>(); // How to display to players
@@ -25,6 +27,9 @@ public class Display : MonoBehaviour
     private GameObject letterPrefab;
 
     public Guess guess;
+
+    // keep tract player's current score
+    private int score = 0;
 
     // List of all letters, wrong letters and remaining correct letters of current word
     private List<char> allLetters = new List<char>();
@@ -59,6 +64,12 @@ public class Display : MonoBehaviour
             if (remainingCorrectLetters.Contains(char.ToUpper(Guess.currentGuess)))
             {
                 remainingCorrectLetters.Remove(char.ToUpper(Guess.currentGuess));
+                // Add score when player guesses correctly, add bonus score when player opens whole word
+                score += Score.SINGLEPOINT;
+                if (remainingCorrectLetters.Count <= 0)
+                {
+                    score += Score.WHOLEWORDPOINT;
+                }
             }
         }
         // Add letter to wrong list when guessing wrong
@@ -70,6 +81,9 @@ public class Display : MonoBehaviour
             }
         }
 
+        // Show player's current score
+        scores.text = score.ToString();
+
         // Show list of missed letters on screen
         string wrongString = "";
         for(int i = 0; i < wrongLetters.Count; i++)
@@ -77,6 +91,7 @@ public class Display : MonoBehaviour
             wrongString += wrongLetters[i].ToString();
             wrongString += (i == wrongLetters.Count - 1) ? "" : " , ";
         }
+        missedLetters.faceColor = new Color32(251, 241, 24, 255);
         missedLetters.text = wrongString;
 
         // Test code - need better implementation
@@ -141,7 +156,7 @@ public class Display : MonoBehaviour
         remainingWordsIndices.Remove(curIndex);
 
         // Show word hint on game scene
-        question.faceColor = new Color32(255, 185, 21, 255);
+        question.faceColor = new Color32(253, 26, 26, 255);
         question.text = wordBank.Words[curIndex].question;
 
         originalPhrase = wordBank.Words[curIndex].answer;
