@@ -12,9 +12,13 @@ public class Display : MonoBehaviour
     public string originalPhrase;
     private char[] solution;
     private char[] guesses;
+    // Word hint
+    public TextMeshProUGUI question;
+    // Missed Letter show
+    public TextMeshProUGUI missedLetters;
 
     // Panels
-    private List<List<GameObject>> panelLayout; // How to display to players
+    private List<List<GameObject>> panelLayout = new List<List<GameObject>>(); // How to display to players
     private List<GameObject> solutionPanels; // How the game sees the panels
 
     [SerializeField]
@@ -22,8 +26,17 @@ public class Display : MonoBehaviour
 
     public Guess guess;
 
+    // List of all letters, wrong letters and remaining correct letters of current word
+    private List<char> allLetters = new List<char>();
+    private List<char> wrongLetters = new List<char>();
+    private List<char> remainingCorrectLetters = new List<char>();
+
     // Words data
     public WordBank wordBank = new WordBank();
+    // Index of current Word in WordBank array
+    private int curIndex = -1;
+    // Keep track of remaining words
+    private List<int> remainingWordsIndices = new List<int>();
 
     string[] wordList;
 
@@ -32,6 +45,7 @@ public class Display : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        LoadWords();
         Setup();
         //Debug.Log(wordBank.Words.Length);
     }
@@ -39,6 +53,31 @@ public class Display : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Remove letter from remaining list when guessing correctly
+        if(allLetters.Contains(char.ToUpper(Guess.currentGuess)))
+        {
+            if (remainingCorrectLetters.Contains(char.ToUpper(Guess.currentGuess)))
+            {
+                remainingCorrectLetters.Remove(char.ToUpper(Guess.currentGuess));
+            }
+        }
+        // Add letter to wrong list when guessing wrong
+        else
+        {
+            if (!wrongLetters.Contains(char.ToUpper(Guess.currentGuess)) && Guess.currentGuess != ' ')
+            {
+                wrongLetters.Add(char.ToUpper(Guess.currentGuess));
+            }
+        }
+
+        // Show list of missed letters on screen
+        string wrongString = "";
+        for(int i = 0; i < wrongLetters.Count; i++)
+        {
+            wrongString += wrongLetters[i].ToString();
+            wrongString += (i == wrongLetters.Count - 1) ? "" : " , ";
+        }
+        missedLetters.text = wrongString;
 
         // Test code - need better implementation
         foreach (int index in charToIndexDict[char.ToUpper(Guess.currentGuess)])
@@ -53,14 +92,59 @@ public class Display : MonoBehaviour
                 panel.GetComponentInChildren<TextMeshProUGUI>().enabled = true;
             }
         }
+
+        // Start a new round
+        if (remainingCorrectLetters.Count <= 0)
+        {
+            
+            Setup();
+        }
     }
 
+    // Reset some variables to initial values to start a new round
+    private void _Reset()
+    {
+        Guess.currentGuess = ' ';
+        allLetters = new List<char>();
+        remainingCorrectLetters = new List<char>();
+        wrongLetters = new List<char>();
+        
+        foreach (List<GameObject> row in panelLayout)
+        {
+            foreach (GameObject panel in row)
+            {
+                panel.SetActive(false);
+            }
+        }
+    }
+
+    private void LoadWords()
+    {
+        // Create Words data
+        wordBank._InstantiateWorld();
+        // Initiate list of ramaining words by indices
+        for(int i = 0; i < wordBank.Words.Length; i++)
+        {
+            remainingWordsIndices.Add(i);
+        }
+    }
     private void Setup()
     {
-        // Create Words data, choose playing word randomly
-        wordBank._InstantiateWorld();
-        int random = Random.Range(0, wordBank.Words.Length);
-        originalPhrase = wordBank.Words[random];
+        _Reset();
+
+        // Choose playing word randomly but should be in remaining words pool
+        do
+        {
+            curIndex = Random.Range(0, wordBank.Words.Length);
+        } while (remainingWordsIndices.Contains(curIndex) == false);
+        // Remove chosen word from remaining words pool
+        remainingWordsIndices.Remove(curIndex);
+
+        // Show word hint on game scene
+        question.faceColor = new Color32(255, 185, 21, 255);
+        question.text = wordBank.Words[curIndex].question;
+
+        originalPhrase = wordBank.Words[curIndex].answer;
 
         solution = originalPhrase.ToCharArray();
 
@@ -73,6 +157,20 @@ public class Display : MonoBehaviour
         // Convert Lowercase to Uppercase
         originalPhrase = originalPhrase.ToUpper();
         alphabet = alphabet.ToUpper();
+
+        // Initiate remaining and all letters lists
+        for(int i = 0; i < originalPhrase.Length; i ++)
+        {
+            if(remainingCorrectLetters.Contains(originalPhrase[i]) == false)
+            {
+                remainingCorrectLetters.Add(originalPhrase[i]);
+            }
+
+            if (allLetters.Contains(originalPhrase[i]) == false)
+            {
+                allLetters.Add(originalPhrase[i]);
+            }
+        }
 
         InitPanelLayout();
         PresentPanel();
