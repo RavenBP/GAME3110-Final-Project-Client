@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,30 +11,46 @@ public class UI : MonoBehaviour
     public TMP_InputField tmpInputField;
     public GameObject errorText; // NOTE: Would be better to specify that this is a TMP Text object...
 
+    public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
+
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     public void Login()
     {
-        if (PlayerInfo.username == "test") // TODO: Check to see if a client with this username exists (maybe inside a list?)
+        if (usernames.Contains(tmpInputField.text)) // Entered username exists within known usernames
         {
-            SceneManager.LoadScene("MainMenuScene"); // Load Game Scene
+            PlayerInfo.username = tmpInputField.text;
+            SceneManager.LoadScene("MainMenuScene");
         }
-        else // Display error text
+        else
         {
-            Debug.Log("Username does not exist.");
             errorText.SetActive(true);
+            Debug.Log("Username does not exist");
         }
     }
 
-    public void EnteredUsername()
+    public void LoadCreateAccountScene()
     {
-        PlayerInfo.username = tmpInputField.text;
-        //Debug.Log("The current value of input field is: " + username);
+        SceneManager.LoadScene("CreateAccountScene");
     }
 
     public void CreateAccount()
     {
-        // Either load a scene or a pop up panel?
+        if (usernames.Contains(tmpInputField.text)) // Entered username exists within known usernames
+        {
+            errorText.SetActive(true);
+        }
+        else if (!usernames.Contains(tmpInputField.text)) // Create account here
+        {
+            usernames.Add(tmpInputField.text);
+            PlayerInfo.username = tmpInputField.text;
+            SceneManager.LoadScene("MainMenuScene");
+
+            //for (int i = 0; i < usernames.Count; i++)
+            //{
+            //    Debug.Log("The " + i + " element in the list contains: " + usernames[i]);
+            //}
+        }
     }
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
@@ -42,7 +59,6 @@ public class UI : MonoBehaviour
 
     public void SubmitLetter()
     {
-        //Debug.Log("Player entered the letter: " + tmpInputField.text);
         Guess.currentGuess = (tmpInputField.text.ToCharArray())[0];
         Debug.Log("Player entered the letter: " + Guess.currentGuess);
     }
