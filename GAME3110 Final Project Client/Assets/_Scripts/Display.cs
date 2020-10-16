@@ -58,53 +58,6 @@ public class Display : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Remove letter from remaining list when guessing correctly
-        if(allLetters.Contains(char.ToUpper(Guess.currentGuess)))
-        {
-            if (remainingCorrectLetters.Contains(char.ToUpper(Guess.currentGuess)))
-            {
-                remainingCorrectLetters.Remove(char.ToUpper(Guess.currentGuess));
-                // Add score when player guesses correctly, add bonus score when player opens whole word
-                score += Score.SINGLEPOINT;
-
-                if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
-                {
-                    score += Score.WHOLEWORDPOINT;
-                    PlayerInfo.numWins++;
-                }
-            }
-        }
-        // Add letter to wrong list when guessing wrong
-        else
-        {
-            if (!wrongLetters.Contains(char.ToUpper(Guess.currentGuess)) && Guess.currentGuess != ' ')
-            {
-                wrongLetters.Add(char.ToUpper(Guess.currentGuess));
-            }
-        }
-
-        // Show player's current score
-        scores.text = score.ToString();
-
-        // Show list of missed letters on screen
-        string wrongString = "";
-        for(int i = 0; i < wrongLetters.Count; i++)
-        {
-            wrongString += wrongLetters[i].ToString();
-            wrongString += (i == wrongLetters.Count - 1) ? "" : " , ";
-        }
-        missedLetters.faceColor = new Color32(251, 241, 24, 255);
-        missedLetters.text = wrongString;
-
-        // Test code - need better implementation
-        if (charToIndexDict.ContainsKey(char.ToUpper(Guess.currentGuess)))
-        {
-            foreach (int index in charToIndexDict[char.ToUpper(Guess.currentGuess)])
-            {
-                solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
-            }
-        }
-
         if (reveal)
         {
             foreach (GameObject panel in solutionPanels)
@@ -118,6 +71,56 @@ public class Display : MonoBehaviour
         {
             
             Setup();
+        }
+    }
+
+    public void MakeGuess(char guess)
+    {
+        // Remove letter from remaining list when guessing correctly
+        if (allLetters.Contains(char.ToUpper(guess)))
+        {
+            if (remainingCorrectLetters.Contains(char.ToUpper(guess)))
+            {
+                remainingCorrectLetters.Remove(char.ToUpper(guess));
+                // Add score when player guesses correctly, add bonus score when player opens whole word
+                score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+
+                if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
+                {
+                    score += Score.WHOLEWORDPOINT;
+                    PlayerInfo.numWins++;
+                }
+            }
+        }
+        // Add letter to wrong list when guessing wrong
+        else
+        {
+            if (!wrongLetters.Contains(char.ToUpper(guess)) && guess != ' ')
+            {
+                wrongLetters.Add(char.ToUpper(guess));
+            }
+        }
+
+        // Show player's current score
+        scores.text = score.ToString();
+
+        // Show list of missed letters on screen
+        string wrongString = "";
+        for (int i = 0; i < wrongLetters.Count; i++)
+        {
+            wrongString += wrongLetters[i].ToString();
+            wrongString += (i == wrongLetters.Count - 1) ? "" : " , ";
+        }
+        missedLetters.faceColor = new Color32(251, 241, 24, 255);
+        missedLetters.text = wrongString;
+
+        // Test code - need better implementation
+        if (charToIndexDict.ContainsKey(char.ToUpper(guess)))
+        {
+            foreach (int index in charToIndexDict[char.ToUpper(guess)])
+            {
+                solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+            }
         }
     }
 

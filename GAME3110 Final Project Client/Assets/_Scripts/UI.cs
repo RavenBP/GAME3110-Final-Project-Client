@@ -12,6 +12,7 @@ public class UI : MonoBehaviour
     public GameObject errorText; // NOTE: Would be better to specify that this is a TMP Text object...
 
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
+    public Display display;
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
@@ -62,7 +63,7 @@ public class UI : MonoBehaviour
         if (tmpInputField.text != "")
         {
             // Clears the gues
-            Guess.currentGuess = (tmpInputField.text.ToCharArray())[0];
+            display.MakeGuess((tmpInputField.text.ToCharArray())[0]);
             tmpInputField.text = "";
         }
         Debug.Log("Player entered the letter: " + Guess.currentGuess);
