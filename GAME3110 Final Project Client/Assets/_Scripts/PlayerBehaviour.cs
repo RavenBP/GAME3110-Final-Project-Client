@@ -7,15 +7,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+    public int id;
     public int score;
     public bool hasTurn;
 
     public Display display;
     public TMP_InputField tmpInputField;
     public Button submitButton;
+
+    UnityEvent loseTurn = new UnityEvent();
 
     // Score show
     public TextMeshProUGUI scores;
@@ -25,6 +29,13 @@ public class PlayerBehaviour : MonoBehaviour
         // Sets the input field to selected
         EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
         tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+
+        
+    }
+
+    public void AddLoseTurnListener(UnityAction action)
+    {
+        loseTurn.AddListener(action);
     }
 
     // Update is called once per frame
@@ -47,6 +58,9 @@ public class PlayerBehaviour : MonoBehaviour
         this.enabled = false;
         tmpInputField.interactable = false;
         submitButton.interactable = false;
+
+        loseTurn.Invoke();
+        Debug.Log("Lose a Turn");
     }
 
     public void EnablePlayer()
@@ -55,6 +69,8 @@ public class PlayerBehaviour : MonoBehaviour
         this.enabled = true;
         tmpInputField.interactable = true;
         submitButton.interactable = true;
+
+        Debug.Log("Your Turn Player " + id);
     }
 
     public void SubmitLetter()
