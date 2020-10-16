@@ -17,8 +17,6 @@ public class Display : MonoBehaviour
     public TextMeshProUGUI question;
     // Missed Letter show
     public TextMeshProUGUI missedLetters;
-    // Score show
-    public TextMeshProUGUI scores;
 
     // Panels
     private List<List<GameObject>> panelLayout = new List<List<GameObject>>(); // How to display to players
@@ -27,10 +25,7 @@ public class Display : MonoBehaviour
     [SerializeField]
     private GameObject letterPrefab;
 
-    public Guess guess;
-
-    // keep tract player's current score
-    private int score = 0;
+    public PlayerBehaviour player;
 
     // List of all letters, wrong letters and remaining correct letters of current word
     private List<char> allLetters = new List<char>();
@@ -84,11 +79,11 @@ public class Display : MonoBehaviour
             {
                 remainingCorrectLetters.Remove(char.ToUpper(guess));
                 // Add score when player guesses correctly, add bonus score when player opens whole word
-                score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+                player.score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
 
                 if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
                 {
-                    score += Score.WHOLEWORDPOINT;
+                    player.score += Score.WHOLEWORDPOINT;
                     PlayerInfo.numWins++;
                 }
             }
@@ -103,7 +98,7 @@ public class Display : MonoBehaviour
         }
 
         // Show player's current score
-        scores.text = score.ToString();
+        player.scores.text = player.score.ToString();
 
         // Show list of missed letters on screen
         string wrongString = "";

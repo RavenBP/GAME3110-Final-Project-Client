@@ -9,25 +9,16 @@ using UnityEngine.EventSystems;
 
 public class UI : MonoBehaviour
 {
-    public TMP_InputField tmpInputField;
     public GameObject errorText; // NOTE: Would be better to specify that this is a TMP Text object...
 
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
-    public Display display;
+    public TMP_InputField tmpInputField;
 
     private void Start()
     {
         // Sets the input field to selected
         EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
         tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            SubmitLetter();
-        }
     }
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
@@ -73,22 +64,6 @@ public class UI : MonoBehaviour
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     ///////////////////////////////////// GameScene /////////////////////////////////////
-
-    public void SubmitLetter()
-    {
-        if (tmpInputField.text != "")
-        {
-            // Sets the input field to selected
-            EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-            tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
-
-            // Clears the guess
-            display.MakeGuess((tmpInputField.text.ToCharArray())[0]);
-            tmpInputField.text = "";
-            tmpInputField.Select();
-        }
-        Debug.Log("Player entered the letter: " + Guess.currentGuess);
-    }
 
     public void ViewAccount()
     {
