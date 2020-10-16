@@ -59,7 +59,12 @@ public class UI : MonoBehaviour
 
     public void SubmitLetter()
     {
-        Guess.currentGuess = (tmpInputField.text.ToCharArray())[0];
+        if (tmpInputField.text != "")
+        {
+            // Clears the gues
+            Guess.currentGuess = (tmpInputField.text.ToCharArray())[0];
+            tmpInputField.text = "";
+        }
         Debug.Log("Player entered the letter: " + Guess.currentGuess);
     }
 
