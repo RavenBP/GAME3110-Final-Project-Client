@@ -4,6 +4,7 @@ using System.ComponentModel;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
@@ -14,6 +15,7 @@ public class PlayerBehaviour : MonoBehaviour
 
     public Display display;
     public TMP_InputField tmpInputField;
+    public Button submitButton;
 
     // Score show
     public TextMeshProUGUI scores;
@@ -21,10 +23,31 @@ public class PlayerBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!hasTurn)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Return))
         {
             SubmitLetter();
         }
+    }
+
+    public void DisablePlayer()
+    {
+        hasTurn = false;
+        this.enabled = false;
+        tmpInputField.interactable = false;
+        submitButton.interactable = false;
+    }
+
+    public void EnablePlayer()
+    {
+        hasTurn = true;
+        this.enabled = true;
+        tmpInputField.interactable = true;
+        submitButton.interactable = true;
     }
 
     public void SubmitLetter()
