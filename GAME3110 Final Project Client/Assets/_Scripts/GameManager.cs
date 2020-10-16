@@ -4,17 +4,34 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private static GameManager instance;
+
+    public static GameManager Instance { get { return instance; } }
+
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+    }
+
     public List<PlayerBehaviour> players;
     int currentPlayer = 0;
+    public UI ui;
 
     // Start is called before the first frame update
     void Start()
     {
-        players[currentPlayer].EnablePlayer(); // Turn player on
+        ui.AddLoseTurnListener(GiveTurn);
 
         for (int i = 0; i < players.Count; i++) 
         {
-            players[i].AddLoseTurnListener(GiveTurn);
             players[i].id = i + 1; 
         }
     }
@@ -31,6 +48,6 @@ public class GameManager : MonoBehaviour
             currentPlayer = 0;
         }
 
-        players[currentPlayer].EnablePlayer();
+        ui.EnableInput();
     }
 }

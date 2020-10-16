@@ -15,27 +15,22 @@ public class PlayerBehaviour : MonoBehaviour
     public int score;
     public bool hasTurn;
 
-    public Display display;
-    public TMP_InputField tmpInputField;
-    public Button submitButton;
+    public GameObject scoreLabelPrefab;
+    GameObject scoreLabel;
+    public UI ui;
 
-    UnityEvent loseTurn = new UnityEvent();
-
-    // Score show
-    public TextMeshProUGUI scores;
+    public GameObject scores;
 
     private void Start()
     {
-        // Sets the input field to selected
-        EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-        tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+        ui = GameObject.Find("UI").gameObject.GetComponent<UI>();
 
-        
-    }
+        // Setup Game Objects by finding them in the scene
+        scoreLabel = ui.scoreLabel;
 
-    public void AddLoseTurnListener(UnityAction action)
-    {
-        loseTurn.AddListener(action);
+        // Instantiate the score label so that new players will have their score go underneath the previous
+        scores = Instantiate(scoreLabelPrefab, ui.scoreLabel.transform);
+        scores.GetComponent<RectTransform>().position += new Vector3(0, (id - 1) * 1);
     }
 
     // Update is called once per frame
@@ -48,54 +43,7 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            SubmitLetter();
+            ui.SubmitLetter(this);
         }
-    }
-
-    public void DisablePlayer()
-    {
-        hasTurn = false;
-        this.enabled = false;
-        tmpInputField.interactable = false;
-        submitButton.interactable = false;
-
-        loseTurn.Invoke();
-        Debug.Log("Lose a Turn");
-    }
-
-    public void EnablePlayer()
-    {
-        hasTurn = true;
-        this.enabled = true;
-        tmpInputField.interactable = true;
-        submitButton.interactable = true;
-
-        Debug.Log("Your Turn Player " + id);
-    }
-
-    public void SubmitLetter()
-    {
-        if (tmpInputField.text != "")
-        {
-            // Clears the guess
-            if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref score))
-            {
-                DisablePlayer();
-            }
-            else
-            {
-                // Sets the input field to selected
-                EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-                tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
-            }
-
-            // Show player's current score
-            scores.text = score.ToString();
-
-            tmpInputField.text = "";
-            tmpInputField.Select();
-        }
-
-        //Debug.Log("Player entered the letter: " + Guess.currentGuess);
     }
 }

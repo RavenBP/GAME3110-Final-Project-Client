@@ -4,8 +4,10 @@ using System.ComponentModel;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 public class UI : MonoBehaviour
 {
@@ -14,9 +16,18 @@ public class UI : MonoBehaviour
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
     public TMP_InputField tmpInputField;
 
+    public Display display;
+    public Button submitButton;
+    public GameObject scoreLabel;
+
     private void Start()
     {
+        // Sets the input field to selected
+        EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+        tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
     }
+
+    
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
@@ -61,6 +72,52 @@ public class UI : MonoBehaviour
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     ///////////////////////////////////// GameScene /////////////////////////////////////
+
+    UnityEvent loseTurn = new UnityEvent();
+
+    public void AddLoseTurnListener(UnityAction action)
+    {
+        loseTurn.AddListener(action);
+    }
+
+    public void SubmitLetter(PlayerBehaviour player)
+    {
+        if (tmpInputField.text != "")
+        {
+            // Clears the guess
+            if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref player.score))
+            {
+                DisableInput();
+                loseTurn.Invoke();
+            }
+            else
+            {
+                // Sets the input field to selected
+                EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+                tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+            }
+
+            // Show player's current score
+            player.scores.GetComponent<TextMeshProUGUI>().text = player.score.ToString();
+
+            tmpInputField.text = "";
+            tmpInputField.Select();
+        }
+
+        //Debug.Log("Player entered the letter: " + Guess.currentGuess);
+    }
+
+    public void DisableInput()
+    {
+        tmpInputField.interactable = false;
+        submitButton.interactable = false;
+    }
+
+    public void EnableInput()
+    {
+        tmpInputField.interactable = true;
+        submitButton.interactable = true;
+    }
 
     public void ViewAccount()
     {

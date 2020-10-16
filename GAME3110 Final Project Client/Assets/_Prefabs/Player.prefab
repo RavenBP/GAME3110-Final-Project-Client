@@ -43,9 +43,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0ddfb57e1c0cb84abaa7c275f428970, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   score: 0
   hasTurn: 1
   display: {fileID: 0}
+  scoreLabelPrefab: {fileID: 6150503222561206285, guid: c7c23402ce4950a4ebb0b7e5938b764c, type: 3}
   tmpInputField: {fileID: 0}
   submitButton: {fileID: 0}
-  scores: {fileID: 0}
+  scoreLabel: {fileID: 0}
