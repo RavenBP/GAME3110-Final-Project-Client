@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class UI : MonoBehaviour
 {
@@ -13,6 +14,12 @@ public class UI : MonoBehaviour
 
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
     public Display display;
+
+    private void Start()
+    {
+        EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+        tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+    }
 
     private void Update()
     {
@@ -70,9 +77,13 @@ public class UI : MonoBehaviour
     {
         if (tmpInputField.text != "")
         {
-            // Clears the gues
+            EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+            tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+
+            // Clears the guess
             display.MakeGuess((tmpInputField.text.ToCharArray())[0]);
             tmpInputField.text = "";
+            tmpInputField.Select();
         }
         Debug.Log("Player entered the letter: " + Guess.currentGuess);
     }
