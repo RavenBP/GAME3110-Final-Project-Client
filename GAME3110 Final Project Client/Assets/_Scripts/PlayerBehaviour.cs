@@ -20,6 +20,13 @@ public class PlayerBehaviour : MonoBehaviour
     // Score show
     public TextMeshProUGUI scores;
 
+    private void Start()
+    {
+        // Sets the input field to selected
+        EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+        tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -54,12 +61,17 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (tmpInputField.text != "")
         {
-            // Sets the input field to selected
-            EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-            tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
-
             // Clears the guess
-            display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref score);
+            if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref score))
+            {
+                DisablePlayer();
+            }
+            else
+            {
+                // Sets the input field to selected
+                EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+                tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+            }
 
             // Show player's current score
             scores.text = score.ToString();
@@ -67,6 +79,7 @@ public class PlayerBehaviour : MonoBehaviour
             tmpInputField.text = "";
             tmpInputField.Select();
         }
-        Debug.Log("Player entered the letter: " + Guess.currentGuess);
+
+        //Debug.Log("Player entered the letter: " + Guess.currentGuess);
     }
 }

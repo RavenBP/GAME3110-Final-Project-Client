@@ -68,7 +68,7 @@ public class Display : MonoBehaviour
         }
     }
 
-    public void MakeGuess(char guess, ref int score)
+    public bool MakeGuess(char guess, ref int score)
     {
         // Remove letter from remaining list when guessing correctly
         if (allLetters.Contains(char.ToUpper(guess)))
@@ -83,7 +83,7 @@ public class Display : MonoBehaviour
                 {
                     score += Score.WHOLEWORDPOINT;
                     PlayerInfo.numWins++;
-                }
+                } 
             }
         }
         // Add letter to wrong list when guessing wrong
@@ -93,17 +93,19 @@ public class Display : MonoBehaviour
             {
                 wrongLetters.Add(char.ToUpper(guess));
             }
-        }
 
-        // Show list of missed letters on screen
-        string wrongString = "";
-        for (int i = 0; i < wrongLetters.Count; i++)
-        {
-            wrongString += wrongLetters[i].ToString();
-            wrongString += (i == wrongLetters.Count - 1) ? "" : " , ";
+            // Show list of missed letters on screen
+            string wrongString = "";
+            for (int i = 0; i < wrongLetters.Count; i++)
+            {
+                wrongString += wrongLetters[i].ToString();
+                wrongString += (i == wrongLetters.Count - 1) ? "" : " , ";
+            }
+            missedLetters.faceColor = new Color32(251, 241, 24, 255);
+            missedLetters.text = wrongString;
+
+            return false;
         }
-        missedLetters.faceColor = new Color32(251, 241, 24, 255);
-        missedLetters.text = wrongString;
 
         // Test code - need better implementation
         if (charToIndexDict.ContainsKey(char.ToUpper(guess)))
@@ -113,6 +115,8 @@ public class Display : MonoBehaviour
                 solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
             }
         }
+
+        return true; // Guessed correctly
     }
 
     // Reset some variables to initial values to start a new round

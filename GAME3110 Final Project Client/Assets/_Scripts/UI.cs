@@ -16,9 +16,6 @@ public class UI : MonoBehaviour
 
     private void Start()
     {
-        // Sets the input field to selected
-        EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-        tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
     }
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
