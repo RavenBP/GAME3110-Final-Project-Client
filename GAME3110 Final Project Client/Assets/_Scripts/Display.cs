@@ -97,9 +97,12 @@ public class Display : MonoBehaviour
         missedLetters.text = wrongString;
 
         // Test code - need better implementation
-        foreach (int index in charToIndexDict[char.ToUpper(Guess.currentGuess)])
+        if (charToIndexDict.ContainsKey(char.ToUpper(Guess.currentGuess)))
         {
-            solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+            foreach (int index in charToIndexDict[char.ToUpper(Guess.currentGuess)])
+            {
+                solutionPanels[index].GetComponentInChildren<TextMeshProUGUI>().enabled = true;
+            }
         }
 
         if (reveal)
