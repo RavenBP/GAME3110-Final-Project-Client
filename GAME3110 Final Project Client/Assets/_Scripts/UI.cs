@@ -14,6 +14,14 @@ public class UI : MonoBehaviour
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
     public Display display;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            SubmitLetter();
+        }
+    }
+
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     public void Login()
