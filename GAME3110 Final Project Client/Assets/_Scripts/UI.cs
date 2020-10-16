@@ -17,6 +17,7 @@ public class UI : MonoBehaviour
 
     private void Start()
     {
+        // Sets the input field to selected
         EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
         tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
     }
@@ -77,6 +78,7 @@ public class UI : MonoBehaviour
     {
         if (tmpInputField.text != "")
         {
+            // Sets the input field to selected
             EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
             tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
 
