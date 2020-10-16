@@ -25,8 +25,6 @@ public class Display : MonoBehaviour
     [SerializeField]
     private GameObject letterPrefab;
 
-    public PlayerBehaviour player;
-
     // List of all letters, wrong letters and remaining correct letters of current word
     private List<char> allLetters = new List<char>();
     private List<char> wrongLetters = new List<char>();
@@ -70,7 +68,7 @@ public class Display : MonoBehaviour
         }
     }
 
-    public void MakeGuess(char guess)
+    public void MakeGuess(char guess, ref int score)
     {
         // Remove letter from remaining list when guessing correctly
         if (allLetters.Contains(char.ToUpper(guess)))
@@ -79,11 +77,11 @@ public class Display : MonoBehaviour
             {
                 remainingCorrectLetters.Remove(char.ToUpper(guess));
                 // Add score when player guesses correctly, add bonus score when player opens whole word
-                player.score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+                score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
 
                 if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
                 {
-                    player.score += Score.WHOLEWORDPOINT;
+                    score += Score.WHOLEWORDPOINT;
                     PlayerInfo.numWins++;
                 }
             }
@@ -96,9 +94,6 @@ public class Display : MonoBehaviour
                 wrongLetters.Add(char.ToUpper(guess));
             }
         }
-
-        // Show player's current score
-        player.scores.text = player.score.ToString();
 
         // Show list of missed letters on screen
         string wrongString = "";

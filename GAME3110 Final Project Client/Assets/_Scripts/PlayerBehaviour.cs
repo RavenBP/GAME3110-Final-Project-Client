@@ -36,7 +36,11 @@ public class PlayerBehaviour : MonoBehaviour
             tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
 
             // Clears the guess
-            display.MakeGuess((tmpInputField.text.ToCharArray())[0]);
+            display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref score);
+
+            // Show player's current score
+            scores.text = score.ToString();
+
             tmpInputField.text = "";
             tmpInputField.Select();
         }
