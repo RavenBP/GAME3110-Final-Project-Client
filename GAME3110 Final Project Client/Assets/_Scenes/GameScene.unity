@@ -464,6 +464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tmpInputField: {fileID: 278554417}
   errorText: {fileID: 0}
+  display: {fileID: 590419743}
 --- !u!1 &215781643
 GameObject:
   m_ObjectHideFlags: 0

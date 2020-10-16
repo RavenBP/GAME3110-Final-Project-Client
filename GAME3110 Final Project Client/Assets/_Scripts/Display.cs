@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class Display : MonoBehaviour
 {
@@ -155,11 +156,8 @@ public class Display : MonoBehaviour
     {
         _Reset();
 
-        // Choose playing word randomly but should be in remaining words pool
-        do
-        {
-            curIndex = Random.Range(0, wordBank.Words.Length);
-        } while (remainingWordsIndices.Contains(curIndex) == false);
+        StartCoroutine(SelectNewWord());
+
         // Remove chosen word from remaining words pool
         remainingWordsIndices.Remove(curIndex);
 
@@ -184,12 +182,12 @@ public class Display : MonoBehaviour
         // Initiate remaining and all letters lists
         for(int i = 0; i < originalPhrase.Length; i ++)
         {
-            if(remainingCorrectLetters.Contains(originalPhrase[i]) == false)
+            if(remainingCorrectLetters.Contains(originalPhrase[i]) == false && System.Char.IsLetter(originalPhrase[i]))
             {
                 remainingCorrectLetters.Add(originalPhrase[i]);
             }
 
-            if (allLetters.Contains(originalPhrase[i]) == false)
+            if (allLetters.Contains(originalPhrase[i]) == false && System.Char.IsLetter(originalPhrase[i]))
             {
                 allLetters.Add(originalPhrase[i]);
             }
@@ -218,6 +216,17 @@ public class Display : MonoBehaviour
             // The key is the alphabet
             charToIndexDict[noSpaces[i]].Add(i);
         }
+    }
+
+    private IEnumerator SelectNewWord()
+    {
+        // Choose playing word randomly but should be in remaining words pool
+        do
+        {
+            curIndex = UnityEngine.Random.Range(0, wordBank.Words.Length);
+
+            yield return null;
+        } while (remainingWordsIndices.Contains(curIndex) == false);
     }
 
     // Init Panels

@@ -11,7 +11,7 @@ public struct WordPack
 // Temporary Words Database
 public class WordBank
 {
-    public WordPack[] Words = new WordPack[10];
+    public WordPack[] Words = new WordPack[12];
 
     public void _InstantiateWorld()
     {
@@ -44,5 +44,11 @@ public class WordBank
 
         Words[9].question = "A theory";
         Words[9].answer = "Big Bang";
+
+        Words[10].question = "A movie";
+        Words[10].answer = "The Lord Of The Rings";
+
+        Words[11].question = "A book series";
+        Words[11].answer = "Harry Potter";
     }
 }
