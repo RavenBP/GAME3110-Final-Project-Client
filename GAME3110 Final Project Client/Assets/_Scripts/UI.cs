@@ -15,10 +15,13 @@ public class UI : MonoBehaviour
 
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
     public TMP_InputField tmpInputField;
+    public TMP_InputField tmpSolveField;
 
     public Display display;
     public Button submitButton;
     public GameObject scoreLabel;
+    public GameObject solve;
+    public GameObject guess;
 
     private void Start()
     {
@@ -82,10 +85,9 @@ public class UI : MonoBehaviour
 
     public void SubmitLetter(PlayerBehaviour player)
     {
-        if (tmpInputField.text != "")
+        if (solve.activeInHierarchy)
         {
-            // Clears the guess
-            if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref player.score))
+            if (!display.Solve(tmpSolveField.text, ref player.score))
             {
                 DisableInput();
                 loseTurn.Invoke();
@@ -96,15 +98,42 @@ public class UI : MonoBehaviour
                 EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
                 tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
             }
-
             // Show player's current score
             player.scores.GetComponent<TextMeshProUGUI>().text = player.score.ToString();
 
-            tmpInputField.text = "";
+            tmpSolveField.text = "";
             tmpInputField.Select();
-        }
 
-        //Debug.Log("Player entered the letter: " + Guess.currentGuess);
+            solve.SetActive(false);
+            guess.SetActive(true);
+            
+        }
+        else if (guess.activeInHierarchy)
+        {
+            if (tmpInputField.text != "")
+            {
+                // Clears the guess
+                if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref player.score))
+                {
+                    DisableInput();
+                    loseTurn.Invoke();
+                }
+                else
+                {
+                    // Sets the input field to selected
+                    EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
+                    tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+                }
+
+                // Show player's current score
+                player.scores.GetComponent<TextMeshProUGUI>().text = player.score.ToString();
+
+                tmpInputField.text = "";
+                tmpInputField.Select();
+            }
+
+            //Debug.Log("Player entered the letter: " + Guess.currentGuess);
+        }
     }
 
     public void DisableInput()

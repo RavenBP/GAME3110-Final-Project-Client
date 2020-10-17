@@ -63,8 +63,8 @@ public class Display : MonoBehaviour
         // Start a new round
         if (remainingCorrectLetters.Count <= 0)
         {
-            
-            Setup();
+
+            StartCoroutine(Solved());
         }
     }
 
@@ -117,6 +117,38 @@ public class Display : MonoBehaviour
         }
 
         return true; // Guessed correctly
+    }
+
+    public bool Solve(string guess, ref int score)
+    {
+        score += Score.WHOLEWORDPOINT;
+        PlayerInfo.numWins++;
+
+        if (originalPhrase == guess.ToUpper().Replace("\n", "") && !reveal)
+        {
+            foreach (char letter in remainingCorrectLetters)
+            {
+                //remainingCorrectLetters.Remove(char.ToUpper(guess));
+                // Add score when player guesses correctly, add bonus score when player opens whole word
+                score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(letter)].Count; // Multiplier bonus
+            }
+
+            reveal = true;
+
+            StartCoroutine(Solved());
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // Delay next round so it is not too sudden
+    IEnumerator Solved()
+    {
+        yield return new WaitForSeconds(0.5f);
+        reveal = false;
+        Setup();
     }
 
     // Reset some variables to initial values to start a new round
