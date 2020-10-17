@@ -49,6 +49,8 @@ public class Display : MonoBehaviour
         //Debug.Log(wordBank.Words.Length);
     }
 
+    bool isNextRoundStarting = false;
+
     // Update is called once per frame
     void Update()
     {
@@ -61,9 +63,9 @@ public class Display : MonoBehaviour
         }
 
         // Start a new round
-        if (remainingCorrectLetters.Count <= 0)
+        if (remainingCorrectLetters.Count <= 0 && !isNextRoundStarting)
         {
-
+            isNextRoundStarting = true;
             StartCoroutine(Solved());
         }
     }
@@ -141,8 +143,9 @@ public class Display : MonoBehaviour
     IEnumerator Solved()
     {
         yield return new WaitForSeconds(0.5f);
-        reveal = false;
         Setup();
+        reveal = false;
+        isNextRoundStarting = false;
     }
 
     // Reset some variables to initial values to start a new round
