@@ -2869,6 +2869,7 @@ MonoBehaviour:
   guessButton: {fileID: 1819776074}
   tmpInputField: {fileID: 278554417}
   tmpSolveField: {fileID: 1667418850}
+  letterValue: {fileID: 1592048760}
 --- !u!1 &1592048760
 GameObject:
   m_ObjectHideFlags: 0

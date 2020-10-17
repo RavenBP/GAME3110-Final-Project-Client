@@ -22,6 +22,7 @@ public class GamePhases : MonoBehaviour
     public GameObject guessButton;
     public TMP_InputField tmpInputField;
     public TMP_InputField tmpSolveField;
+    public GameObject letterValue;
 
     private void Start()
     {
@@ -34,34 +35,47 @@ public class GamePhases : MonoBehaviour
         switch (phase)
         {
             case GamePhase.SPIN:
+
+                letterValue.SetActive(true);
                 tmpInputField.gameObject.SetActive(false);
                 tmpSolveField.gameObject.SetActive(false);
                 solveButton.SetActive(false);
                 guessButton.SetActive(false);
                 submitButton.gameObject.SetActive(false);
                 spinButton.gameObject.SetActive(true);
+
                 break;
             case GamePhase.SELECT:
+
+                letterValue.SetActive(false);
                 tmpInputField.gameObject.SetActive(false);
                 tmpSolveField.gameObject.SetActive(false);
                 solveButton.SetActive(true);
                 guessButton.SetActive(true);
                 submitButton.gameObject.SetActive(false);
                 spinButton.gameObject.SetActive(false);
+
                 break;
             case GamePhase.GUESS:
+
+                letterValue.SetActive(true);
                 tmpInputField.gameObject.SetActive(true);
                 tmpSolveField.gameObject.SetActive(false);
                 solveButton.SetActive(false);
                 submitButton.gameObject.SetActive(true);
                 spinButton.gameObject.SetActive(false);
+
                 break;
             case GamePhase.SOLVE:
+
+                letterValue.SetActive(false);
+                solveButton.SetActive(false);
                 guessButton.SetActive(false);
                 tmpInputField.gameObject.SetActive(false);
                 tmpSolveField.gameObject.SetActive(true);
                 submitButton.gameObject.SetActive(true);
                 spinButton.gameObject.SetActive(false);
+
                 break;
         }
     }
