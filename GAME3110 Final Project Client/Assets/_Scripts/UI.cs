@@ -23,15 +23,6 @@ public class UI : MonoBehaviour
     public GameObject solve;
     public GameObject guess;
 
-    private void Start()
-    {
-        // Sets the input field to selected
-        EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-        tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
-    }
-
-    
-
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     public void Login()
@@ -85,12 +76,16 @@ public class UI : MonoBehaviour
 
     public void SubmitLetter(PlayerBehaviour player)
     {
-        if (solve.activeInHierarchy)
+        if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.SPIN))
         {
-            if (!display.Solve(tmpSolveField.text, ref player.score))
+            return;
+        }
+
+        if (solve.activeInHierarchy && GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.SOLVE))
+        {
+            if (!display.Solve(tmpSolveField.text, ref player))
             {
-                DisableInput();
-                loseTurn.Invoke();
+                LoseTurn();
             }
             else
             {
@@ -99,24 +94,26 @@ public class UI : MonoBehaviour
                 tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
             }
             // Show player's current score
-            player.scores.GetComponent<TextMeshProUGUI>().text = player.score.ToString();
+            player.scores.GetComponent<TextMeshProUGUI>().text = (player.cumulativeScore + player.roundScore).ToString();
 
             tmpSolveField.text = "";
             tmpInputField.Select();
 
             solve.SetActive(false);
             guess.SetActive(true);
-            
+
+            GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
         }
-        else if (guess.activeInHierarchy)
+        else if (guess.activeInHierarchy && GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
         {
             if (tmpInputField.text != "")
             {
+                int scoreVal = GameManager.Instance.roulette.GetSpinResult();
+
                 // Clears the guess
-                if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref player.score))
+                if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref player, scoreVal))
                 {
-                    DisableInput();
-                    loseTurn.Invoke();
+                    LoseTurn();
                 }
                 else
                 {
@@ -126,14 +123,22 @@ public class UI : MonoBehaviour
                 }
 
                 // Show player's current score
-                player.scores.GetComponent<TextMeshProUGUI>().text = player.score.ToString();
+                player.scores.GetComponent<TextMeshProUGUI>().text = (player.cumulativeScore + player.roundScore).ToString();
 
                 tmpInputField.text = "";
                 tmpInputField.Select();
-            }
 
-            //Debug.Log("Player entered the letter: " + Guess.currentGuess);
+                GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
+                //Debug.Log("Player entered the letter: " + Guess.currentGuess);
+            }
         }
+    }
+
+    public void LoseTurn()
+    {
+        Debug.Log("LOSE TURN");
+        DisableInput();
+        loseTurn.Invoke();
     }
 
     public void DisableInput()

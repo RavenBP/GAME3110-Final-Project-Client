@@ -68,7 +68,7 @@ public class Display : MonoBehaviour
         }
     }
 
-    public bool MakeGuess(char guess, ref int score)
+    public bool MakeGuess(char guess, ref PlayerBehaviour player, int scoreVal)
     {
         // Remove letter from remaining list when guessing correctly
         if (allLetters.Contains(char.ToUpper(guess)))
@@ -76,12 +76,14 @@ public class Display : MonoBehaviour
             if (remainingCorrectLetters.Contains(char.ToUpper(guess)))
             {
                 remainingCorrectLetters.Remove(char.ToUpper(guess));
+
                 // Add score when player guesses correctly, add bonus score when player opens whole word
-                score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+                player.roundScore += scoreVal * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+
 
                 if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
                 {
-                    score += Score.WHOLEWORDPOINT;
+                    player.roundScore += (int)Score.WHOLEWORDPOINT;
                     PlayerInfo.numWins++;
                 } 
             }
@@ -119,20 +121,19 @@ public class Display : MonoBehaviour
         return true; // Guessed correctly
     }
 
-    public bool Solve(string guess, ref int score)
+    public bool Solve(string guess, ref PlayerBehaviour player)
     {
-        score += Score.WHOLEWORDPOINT;
-        PlayerInfo.numWins++;
-
         if (originalPhrase == guess.ToUpper().Replace("\n", "") && !reveal)
         {
-            foreach (char letter in remainingCorrectLetters)
-            {
-                //remainingCorrectLetters.Remove(char.ToUpper(guess));
-                // Add score when player guesses correctly, add bonus score when player opens whole word
-                score += Score.SINGLEPOINT * charToIndexDict[char.ToUpper(letter)].Count; // Multiplier bonus
-            }
+            //foreach (char letter in remainingCorrectLetters)
+            //{
+            //    //remainingCorrectLetters.Remove(char.ToUpper(guess));
+            //    // Add score when player guesses correctly, add bonus score when player opens whole word
+            //    score += (int)Score.THREEHUNDREDPOINT * charToIndexDict[char.ToUpper(letter)].Count; // Multiplier bonus
+            //}
 
+            player.roundScore += (int)Score.WHOLEWORDPOINT;
+            PlayerInfo.numWins++;
             reveal = true;
 
             StartCoroutine(Solved());
@@ -154,6 +155,9 @@ public class Display : MonoBehaviour
     // Reset some variables to initial values to start a new round
     private void _Reset()
     {
+        GameManager.Instance.clientPlayer.cumulativeScore += GameManager.Instance.clientPlayer.roundScore;
+        GameManager.Instance.clientPlayer.roundScore = 0;
+
         Guess.currentGuess = ' ';
         allLetters = new List<char>();
         remainingCorrectLetters = new List<char>();

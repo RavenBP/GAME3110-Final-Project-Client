@@ -12,7 +12,8 @@ using UnityEngine.Events;
 public class PlayerBehaviour : MonoBehaviour
 {
     public int id;
-    public int score;
+    public int cumulativeScore;
+    public int roundScore;
     public bool hasTurn;
 
     public GameObject scoreLabelPrefab;
