@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Hand turn to next player in list
     void GiveTurn()
     {
         // Check end of index
@@ -56,10 +57,5 @@ public class GameManager : MonoBehaviour
         }
 
         ui.EnableInput();
-    }
-
-    public void BankPoints()
-    {
-        clientPlayer.cumulativeScore += clientPlayer.roundScore;
     }
 }

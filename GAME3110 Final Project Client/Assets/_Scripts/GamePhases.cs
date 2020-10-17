@@ -30,6 +30,7 @@ public class GamePhases : MonoBehaviour
 
     private void Update()
     {
+        // Turns on/off UI elements based on player's choices
         switch (phase)
         {
             case GamePhase.SPIN:

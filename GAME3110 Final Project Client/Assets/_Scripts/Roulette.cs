@@ -19,6 +19,7 @@ public class Roulette : MonoBehaviour
 
     public void StartStop()
     {
+        // Do not spin wheel when guessing a letter
         if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
         {
             return;
@@ -40,11 +41,15 @@ public class Roulette : MonoBehaviour
     {
         while (spinning)
         {
+            // Cycle through Score to simulate a roulette
             randomValue = (Score)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+
+            // Score text
             if ((int)randomValue > 0)
             {
                 display.text = ((int)randomValue).ToString();
             }
+            // LOSETURN BANKRUPT Texts
             else
             {
                 display.text = randomValue.ToString().Remove(randomValue.ToString().Length-1);

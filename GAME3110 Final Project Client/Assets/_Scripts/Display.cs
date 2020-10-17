@@ -125,13 +125,6 @@ public class Display : MonoBehaviour
     {
         if (originalPhrase == guess.ToUpper().Replace("\n", "") && !reveal)
         {
-            //foreach (char letter in remainingCorrectLetters)
-            //{
-            //    //remainingCorrectLetters.Remove(char.ToUpper(guess));
-            //    // Add score when player guesses correctly, add bonus score when player opens whole word
-            //    score += (int)Score.THREEHUNDREDPOINT * charToIndexDict[char.ToUpper(letter)].Count; // Multiplier bonus
-            //}
-
             player.roundScore += (int)Score.WHOLEWORDPOINT;
             PlayerInfo.numWins++;
             reveal = true;
@@ -155,6 +148,7 @@ public class Display : MonoBehaviour
     // Reset some variables to initial values to start a new round
     private void _Reset()
     {
+        // Add up round score and reset it
         GameManager.Instance.clientPlayer.cumulativeScore += GameManager.Instance.clientPlayer.roundScore;
         GameManager.Instance.clientPlayer.roundScore = 0;
 
