@@ -159,7 +159,9 @@ public class Display : MonoBehaviour
         allLetters = new List<char>();
         remainingCorrectLetters = new List<char>();
         wrongLetters = new List<char>();
-        
+        missedLetters.text = "";
+
+
         foreach (List<GameObject> row in panelLayout)
         {
             foreach (GameObject panel in row)
