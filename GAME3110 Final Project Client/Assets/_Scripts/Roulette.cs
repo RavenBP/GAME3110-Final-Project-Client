@@ -47,11 +47,13 @@ public class Roulette : MonoBehaviour
             // Score text
             if ((int)randomValue > 0)
             {
+                display.faceColor = new Color32(11, 12, 135, 255);
                 display.text = ((int)randomValue).ToString();
             }
             // LOSETURN BANKRUPT Texts
             else
             {
+                display.faceColor = new Color32(251,38,11,255);
                 display.text = randomValue.ToString().Remove(randomValue.ToString().Length-1);
             }
 

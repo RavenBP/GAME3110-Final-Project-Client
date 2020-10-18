@@ -31,7 +31,7 @@ public class PlayerBehaviour : MonoBehaviour
 
         // Instantiate the score label so that new players will have their score go underneath the previous
         scores = Instantiate(scoreLabelPrefab, ui.scoreLabel.transform);
-        scores.GetComponent<RectTransform>().position += new Vector3(0, (id - 1) * 1);
+        scores.GetComponent<RectTransform>().position += new Vector3(0, (id - 1) * 0.01f);
     }
 
     // Update is called once per frame
