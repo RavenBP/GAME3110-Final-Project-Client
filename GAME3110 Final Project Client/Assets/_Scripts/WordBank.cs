@@ -21,7 +21,7 @@ public class WordBank
         Words[1].question = "Currency";
         Words[1].answer = "Money";
 
-        Words[2].question = "A continental";
+        Words[2].question = "A continent";
         Words[2].answer = "America";
 
         Words[3].question = "Sweet spice";
@@ -33,7 +33,7 @@ public class WordBank
         Words[5].question = "Money container";
         Words[5].answer = "Wallet";
 
-        Words[6].question = "Robin fella";
+        Words[6].question = "Robin's Sidekick";
         Words[6].answer = "Batman";
 
         Words[7].question = "Small rodent";
