@@ -8,10 +8,6 @@ using System.Net;
 
 public class NetworkMatchLoop : MonoBehaviour
 {
-    public UdpClient udp;
-    public string uid; // TODO: REMOVE AFTER INTEGRATION
-
-    public Message latestMessage;
     [Serializable]
     public class Message
     {
@@ -22,7 +18,8 @@ public class NetworkMatchLoop : MonoBehaviour
     [Serializable]
     public class Player
     {
-        public int score; 
+        public string userid;
+        public int score;
     }
 
     [Serializable]
@@ -30,6 +27,12 @@ public class NetworkMatchLoop : MonoBehaviour
     {
         public Player[] players;
     }
+
+    public UdpClient udp;
+    public string uid; // TODO: REMOVE AFTER INTEGRATION
+
+    public Message latestMessage;
+    public GameState gameState;
 
     // TODO: REMOVE AFTER INTEGRATION
     private void Start()
@@ -74,12 +77,17 @@ public class NetworkMatchLoop : MonoBehaviour
         latestMessage = JsonUtility.FromJson<Message>(returnData);
         try
         {
-            //switch (latestMessage.cmd)
-            //{
-            //    default:
-            //        Debug.Log("Error");
-            //        break;
-            //}
+            switch (latestMessage.command)
+            {
+                case "update":
+                    gameState = JsonUtility.FromJson<GameState>(returnData);
+                    Debug.Log(gameState.players[0].score);
+                    break;
+
+                default:
+                    Debug.Log("Error");
+                    break;
+            }
         }
         catch (Exception e)
         {

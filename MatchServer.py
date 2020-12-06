@@ -29,7 +29,7 @@ def ConnectionLoop(sock, playersInMatch):
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
 	# Check if the player belongs in this match
-	if userid in playersInMatch:
+	if userid in playersInMatch.keys():
 		# Check if player is registered in the match
 		if userid not in players:
 			return True
@@ -39,8 +39,9 @@ def ConfirmPlayerHasConnected(userid, playersInMatch):
 def CreatePlayerGameData(addr, userid):
 	gameData = {}
 	players[userid] = gameData
+	gameData['userid'] = userid # For client reference
 	gameData['addr'] = addr
-	gameData['score'] = 0
+	gameData['score'] = 99
 
 	print("Players in match: ")
 	print(players)
@@ -52,7 +53,11 @@ def ServerGameStateRelay(sock):
 
 		for player in players.values():
 
-			gameStateMsg = json.dumps(players)
+			gameStateMsg = {'players': []}
+			gameStateMsg['players'].append(player)
+			gameStateMsg["command"] = "update"
+			gameStateMsg = json.dumps(gameStateMsg)
+
 			address = player['addr']
 			sock.sendto(bytes(gameStateMsg, 'utf8'), address)
 
@@ -61,7 +66,7 @@ def ServerGameStateRelay(sock):
 def StartMatchLoop(sock):
 	print("Match started")
 
-	start_new_thread(ConnectionLoop,(sock,['0'],))
+	start_new_thread(ConnectionLoop,(sock,{'0':{}},))
 	start_new_thread(ServerGameStateRelay,(sock,))
 
 ################################################ Test Code
