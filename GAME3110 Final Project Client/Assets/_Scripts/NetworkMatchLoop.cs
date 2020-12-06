@@ -16,14 +16,18 @@ public class NetworkMatchLoop : MonoBehaviour
     }
 
     [Serializable]
-    public class Player
+    public class Player : Message
     {
+        public int orderid; // Turn order
+        public string state; // Another turn or lose turn
+        public string letterGuess;
+        public string solveGuess;
         public string userid;
         public int score;
     }
 
     [Serializable]
-    public class GameState
+    public class GameState : Message
     {
         public Player[] players;
     }
@@ -33,6 +37,9 @@ public class NetworkMatchLoop : MonoBehaviour
 
     public Message latestMessage;
     public GameState gameState;
+
+    public PlayerBehaviour player;
+    public UI ui;
 
     // TODO: REMOVE AFTER INTEGRATION
     private void Start()
@@ -113,9 +120,25 @@ public class NetworkMatchLoop : MonoBehaviour
         SendMessage(heartMsg);
     }
 
+    void SendGameUpdate()
+    {
+        Player gameMsg = new Player();
+
+        gameMsg.command = "gameUpdate";
+        gameMsg.score = player.cumulativeScore + player.roundScore; // Players score according to the UI label
+        gameMsg.orderid = player.id; // ID inside the game, not profile id
+        gameMsg.state = GameManager.Instance.state; 
+        gameMsg.userid = uid; // User ID, the client that sent this message
+        gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
+        gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
+
+        SendMessage(gameMsg);
+    }
+
     // Update is called once per frame
     void Update()
     {
         HeartBeat();
+        SendGameUpdate();
     }
 }

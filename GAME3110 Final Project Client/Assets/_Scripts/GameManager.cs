@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour
     public GamePhases gamePhaseManager;
     public Roulette roulette;
 
+    public string state;
+
     // Start is called before the first frame update
     void Start()
     {

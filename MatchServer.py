@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 
 players = {}
+players_lock = threading.Lock()
 
 ################################################ Checking Players' Connections
 
@@ -16,14 +17,19 @@ def ConnectionLoop(sock, playersInMatch):
 		data, addr = sock.recvfrom(1024)
 		data = json.loads(data)
 
+		# Who sent it
+		userid = data['uid']
+
 		if 'command' in data:
 			if data['command'] == 'connect':
-				userid = data['uid']
-
+	
 				if ConfirmPlayerHasConnected(userid, playersInMatch):
 					CreatePlayerGameData(addr, userid)
 
-			if data['command'] == 'heartbeat':
+			elif data['command'] == 'heartbeat':
+				players[userid]['lastHeartBeat'] = datetime.now();
+
+			else:
 				print(data)
 
 def ConfirmPlayerHasConnected(userid, playersInMatch):
@@ -37,11 +43,17 @@ def ConfirmPlayerHasConnected(userid, playersInMatch):
 	return False
 
 def CreatePlayerGameData(addr, userid):
+	players_lock.acquire()
 	gameData = {}
-	players[userid] = gameData
+
 	gameData['userid'] = userid # For client reference
 	gameData['addr'] = addr
-	gameData['score'] = 99
+	gameData['score'] = 0
+	gameData['turnOrder'] = len(players) # Turn order will be time players join match
+	gameData['lastHeartBeat'] = datetime.now()
+
+	players[userid] = gameData
+	players_lock.release()
 
 	print("Players in match: ")
 	print(players)
@@ -52,9 +64,11 @@ def ServerGameStateRelay(sock):
 	while True:
 
 		for player in players.values():
+			playerData = player.copy()
+			playerData.pop('lastHeartBeat'); # datetime is not serializable, so removing it from copy
 
 			gameStateMsg = {'players': []}
-			gameStateMsg['players'].append(player)
+			gameStateMsg['players'].append(playerData)
 			gameStateMsg["command"] = "update"
 			gameStateMsg = json.dumps(gameStateMsg)
 

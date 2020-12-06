@@ -610,6 +610,8 @@ MonoBehaviour:
   scoreLabel: {fileID: 1393940051}
   solve: {fileID: 1667418848}
   guess: {fileID: 278554415}
+  guessChar: 0
+  guessSolve: 
 --- !u!1 &215781643
 GameObject:
   m_ObjectHideFlags: 0
@@ -2415,6 +2417,12 @@ MonoBehaviour:
   latestMessage:
     command: 
     uid: 
+  gameState:
+    command: 
+    uid: 
+    players: []
+  player: {fileID: 893730635}
+  ui: {fileID: 206473345}
 --- !u!4 &1289028769
 Transform:
   m_ObjectHideFlags: 0
@@ -3151,6 +3159,7 @@ MonoBehaviour:
   display: {fileID: 0}
   gamePhaseManager: {fileID: 1478406710}
   roulette: {fileID: 1267479694}
+  state: 
 --- !u!4 &1478406709
 Transform:
   m_ObjectHideFlags: 0

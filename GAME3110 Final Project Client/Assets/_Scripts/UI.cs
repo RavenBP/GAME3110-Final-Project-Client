@@ -23,6 +23,9 @@ public class UI : MonoBehaviour
     public GameObject solve;
     public GameObject guess;
 
+    public char guessChar;
+    public string guessSolve;
+
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     public void Login()
@@ -110,8 +113,10 @@ public class UI : MonoBehaviour
             {
                 int scoreVal = GameManager.Instance.roulette.GetSpinResult();
 
+                guessChar = (tmpInputField.text.ToCharArray())[0];
+
                 // Clears the guess
-                if (!display.MakeGuess((tmpInputField.text.ToCharArray())[0], ref player, scoreVal))
+                if (!display.MakeGuess(guessChar, ref player, scoreVal))
                 {
                     LoseTurn();
                 }
