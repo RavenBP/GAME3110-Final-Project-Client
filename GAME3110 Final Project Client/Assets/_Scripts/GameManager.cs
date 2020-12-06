@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
 
     public List<PlayerBehaviour> players;
     public PlayerBehaviour clientPlayer;
-    int currentPlayer = 0;
+    public int currentPlayer = 0;
     public UI ui;
 
     public Display display;

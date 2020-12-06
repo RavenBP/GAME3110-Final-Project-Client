@@ -8,6 +8,8 @@ import json
 players = {}
 players_lock = threading.Lock()
 
+heartbeats = {}
+
 ################################################ Checking Players' Connections
 
 # For waiting for players to enter room
@@ -27,10 +29,11 @@ def ConnectionLoop(sock, playersInMatch):
 					CreatePlayerGameData(addr, userid)
 
 			elif data['command'] == 'heartbeat':
-				players[userid]['lastHeartBeat'] = datetime.now();
+				heartbeats[userid] = datetime.now();
 
-			else:
-				print(data)
+			elif data['command'] == 'gameUpdate':
+				# Json format: { 'command': '', 'uid': '', 'orderid': 0, 'state': '', 'letterGuess': '', 'solveGuess': '', 'score': 0}
+				PlayerGameDataUpdate(data, userid)
 
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
@@ -42,15 +45,22 @@ def ConfirmPlayerHasConnected(userid, playersInMatch):
 
 	return False
 
+############################################### Match Functions
+
 def CreatePlayerGameData(addr, userid):
 	players_lock.acquire()
 	gameData = {}
 
-	gameData['userid'] = userid # For client reference
+	gameData['uid'] = userid # For client reference
 	gameData['addr'] = addr
+
 	gameData['score'] = 0
-	gameData['turnOrder'] = len(players) # Turn order will be time players join match
-	gameData['lastHeartBeat'] = datetime.now()
+	gameData['orderid'] = len(players) # Turn order will be time players join match
+	gameData['state'] = ''
+	gameData['letterGuess'] = ''
+	gameData['solveGuess'] = ''
+
+	heartbeats[userid] = datetime.now()
 
 	players[userid] = gameData
 	players_lock.release()
@@ -58,17 +68,26 @@ def CreatePlayerGameData(addr, userid):
 	print("Players in match: ")
 	print(players)
 
+def PlayerGameDataUpdate(data, userid):
+	players_lock.acquire()
+
+	players[userid]['score'] = data['score']
+	players[userid]['orderid'] = data['orderid']
+	players[userid]['state'] = data['state']
+	players[userid]['letterGuess'] = data['letterGuess']
+	players[userid]['solveGuess'] = data['solveGuess']
+
+	players_lock.release()
+
 ################################################ Server Messaging
 
 def ServerGameStateRelay(sock):
 	while True:
 
 		for player in players.values():
-			playerData = player.copy()
-			playerData.pop('lastHeartBeat'); # datetime is not serializable, so removing it from copy
 
 			gameStateMsg = {'players': []}
-			gameStateMsg['players'].append(playerData)
+			gameStateMsg['players'].append(player)
 			gameStateMsg["command"] = "update"
 			gameStateMsg = json.dumps(gameStateMsg)
 

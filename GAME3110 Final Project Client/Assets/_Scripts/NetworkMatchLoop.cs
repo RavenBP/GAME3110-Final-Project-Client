@@ -22,7 +22,6 @@ public class NetworkMatchLoop : MonoBehaviour
         public string state; // Another turn or lose turn
         public string letterGuess;
         public string solveGuess;
-        public string userid;
         public int score;
     }
 
@@ -124,11 +123,12 @@ public class NetworkMatchLoop : MonoBehaviour
     {
         Player gameMsg = new Player();
 
+        gameMsg.uid = uid;
         gameMsg.command = "gameUpdate";
+
         gameMsg.score = player.cumulativeScore + player.roundScore; // Players score according to the UI label
-        gameMsg.orderid = player.id; // ID inside the game, not profile id
+        gameMsg.orderid = GameManager.Instance.currentPlayer; // ID inside the game, not profile id
         gameMsg.state = GameManager.Instance.state; 
-        gameMsg.userid = uid; // User ID, the client that sent this message
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
 
