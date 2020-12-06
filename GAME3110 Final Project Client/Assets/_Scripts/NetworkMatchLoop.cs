@@ -19,6 +19,18 @@ public class NetworkMatchLoop : MonoBehaviour
         public string uid; // Who is sending the message, identified by user id
     }
 
+    [Serializable]
+    public class Player
+    {
+        public int score; 
+    }
+
+    [Serializable]
+    public class GameState
+    {
+        public Player[] players;
+    }
+
     // TODO: REMOVE AFTER INTEGRATION
     private void Start()
     {

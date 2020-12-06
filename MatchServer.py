@@ -7,6 +7,8 @@ import json
 
 players = {}
 
+################################################ Checking Players' Connections
+
 # For waiting for players to enter room
 # and to check for connection drops
 def ConnectionLoop(sock, playersInMatch):
@@ -16,32 +18,53 @@ def ConnectionLoop(sock, playersInMatch):
 
 		if 'command' in data:
 			if data['command'] == 'connect':
-				ConfirmPlayerHasConnected(data, playersInMatch)
+				userid = data['uid']
+
+				if ConfirmPlayerHasConnected(userid, playersInMatch):
+					CreatePlayerGameData(addr, userid)
 
 			if data['command'] == 'heartbeat':
 				print(data)
 
-def ConfirmPlayerHasConnected(data, playersInMatch):
-	userid = data['uid']
+def ConfirmPlayerHasConnected(userid, playersInMatch):
 
 	# Check if the player belongs in this match
 	if userid in playersInMatch:
 		# Check if player is registered in the match
 		if userid not in players:
-			# Set the player game data here
-			CreatePlayerGameData(userid)
-			print("Players in match: ")
-			print(players)
+			return True
 
-def CreatePlayerGameData(userid):
+	return False
+
+def CreatePlayerGameData(addr, userid):
 	gameData = {}
 	players[userid] = gameData
+	gameData['addr'] = addr
 	gameData['score'] = 0
+
+	print("Players in match: ")
+	print(players)
+
+################################################ Server Messaging
+
+def ServerGameStateRelay(sock):
+	while True:
+
+		for player in players.values():
+
+			gameStateMsg = json.dumps(players)
+			address = player['addr']
+			sock.sendto(bytes(gameStateMsg, 'utf8'), address)
+
+################################################ Start Match
 
 def StartMatchLoop(sock):
 	print("Match started")
 
-	start_new_thread(ConnectionLoop,(sock,{'0':{}},))
+	start_new_thread(ConnectionLoop,(sock,['0'],))
+	start_new_thread(ServerGameStateRelay,(sock,))
+
+################################################ Test Code
 
 def main():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
