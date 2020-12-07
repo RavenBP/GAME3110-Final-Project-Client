@@ -78,7 +78,7 @@ public class Roulette : MonoBehaviour
             ui.LoseTurn();
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
             GameManager.Instance.clientPlayer.roundScore = 0;
-            GameManager.Instance.clientPlayer.scores.GetComponent<TextMeshProUGUI>().text = (GameManager.Instance.clientPlayer.cumulativeScore + GameManager.Instance.clientPlayer.roundScore).ToString();
+            GameManager.Instance.clientPlayer.DisplayScore();
         }
 
         return (int)randomValue;

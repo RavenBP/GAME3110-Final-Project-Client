@@ -32,7 +32,7 @@ def ConnectionLoop(sock, playersInMatch):
 				heartbeats[userid] = datetime.now();
 
 			elif data['command'] == 'gameUpdate':
-				# Json format: { 'command': '', 'uid': '', 'orderid': 0, 'state': '', 'letterGuess': '', 'solveGuess': '', 'score': 0}
+				# Json format: { 'command': '', 'uid': '', 'orderid': 0, 'state': '', 'letterGuess': '', 'solveGuess': '', 'roundScore': 0, 'cumulativeScore': 0}
 				PlayerGameDataUpdate(data, userid, sock)
 
 def ConfirmPlayerHasConnected(userid, playersInMatch):
@@ -54,11 +54,12 @@ def CreatePlayerGameData(addr, userid, sock):
 	gameData['uid'] = userid # For client reference
 	gameData['addr'] = addr
 
-	gameData['score'] = 0
 	gameData['orderid'] = len(players) # Turn order will be time players join match
 	gameData['state'] = ''
 	gameData['letterGuess'] = ''
 	gameData['solveGuess'] = ''
+	gameData['roundScore'] = 0
+	gameData['cumulativeScore'] = 0
 
 	heartbeats[userid] = datetime.now()
 
@@ -85,11 +86,12 @@ def CreatePlayerGameData(addr, userid, sock):
 def PlayerGameDataUpdate(data, userid, sock):
 	players_lock.acquire()
 
-	players[userid]['score'] = data['score']
 	players[userid]['orderid'] = data['orderid']
 	players[userid]['state'] = data['state']
 	players[userid]['letterGuess'] = data['letterGuess']
 	players[userid]['solveGuess'] = data['solveGuess']
+	players[userid]['roundScore'] = data['roundScore']
+	players[userid]['cumulativeScore'] = data['cumulativeScore']
 
 	players_lock.release()
 
@@ -102,8 +104,9 @@ def ServerGameStateRelay(sock, userid):
 
 	for player in players.values():
 		#if player['uid'] != userid:
-		gameStateMsg = {'players': []}
-		gameStateMsg['players'].append(player)
+		#gameStateMsg = {'players': []}
+		#gameStateMsg['players'].append(player)
+		gameStateMsg = player.copy()
 		gameStateMsg["command"] = "update"
 		gameStateMsg = json.dumps(gameStateMsg)
 

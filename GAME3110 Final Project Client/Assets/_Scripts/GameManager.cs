@@ -56,19 +56,23 @@ public class GameManager : MonoBehaviour
         }
 
         GameObject newPlayer = Instantiate(playerPrefab);
+        PlayerBehaviour newPlayerBehaviour = newPlayer.GetComponent<PlayerBehaviour>();
+
+        newPlayerBehaviour.id = player.orderid;
 
         // If the new player is this player
         if (player.uid == uid)
         {
-            clientPlayer = newPlayer.GetComponent<PlayerBehaviour>();
-            clientPlayer.id = player.orderid;
+            clientPlayer = newPlayerBehaviour;
 
             if (player.orderid != 0)
             {
                 ui.DisableInput();
             }
         }
-        players.Add(player.orderid, newPlayer.GetComponent<PlayerBehaviour>());
+        newPlayerBehaviour.SetPlayerProfileUI();
+
+        players.Add(player.orderid, newPlayerBehaviour);
         playerDebug.Add(newPlayer.GetComponent<PlayerBehaviour>());
     }
 

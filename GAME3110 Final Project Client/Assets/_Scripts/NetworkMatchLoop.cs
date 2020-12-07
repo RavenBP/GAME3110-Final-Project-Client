@@ -22,7 +22,9 @@ public class NetworkMatchLoop : MonoBehaviour
         public string state; // Another turn or lose turn
         public string letterGuess;
         public string solveGuess;
-        public int score;
+        public int roundScore;
+        public int cumulativeScore;
+        public int currentPlayer;
     }
 
     [Serializable]
@@ -94,7 +96,17 @@ public class NetworkMatchLoop : MonoBehaviour
                     break;
 
                 case "update":
-                    gameState = JsonUtility.FromJson<GameState>(returnData);
+                    Player playerUpdate = JsonUtility.FromJson<Player>(returnData);
+
+                    // Make sure not my own update
+                    if (playerUpdate.uid != uid && GameManager.Instance.players.ContainsKey(playerUpdate.orderid))
+                    {
+                        PlayerBehaviour player = GameManager.Instance.players[playerUpdate.orderid];
+
+                        player.roundScore = playerUpdate.roundScore;
+                        player.cumulativeScore = playerUpdate.cumulativeScore;
+                    }
+
                     break;
 
                 default:
@@ -138,11 +150,13 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.uid = uid;
         gameMsg.command = "gameUpdate";
 
-        gameMsg.score = GameManager.Instance.clientPlayer.cumulativeScore + GameManager.Instance.clientPlayer.roundScore; // Players score according to the UI label
-        gameMsg.orderid = GameManager.Instance.currentPlayer; // ID inside the game, not profile id
+        gameMsg.roundScore = GameManager.Instance.clientPlayer.roundScore;
+        gameMsg.cumulativeScore = GameManager.Instance.clientPlayer.cumulativeScore; // Players score according to the UI label
+        gameMsg.orderid = GameManager.Instance.clientPlayer.id; // ID inside the game, not profile id
         gameMsg.state = GameManager.Instance.state; 
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
+        gameMsg.currentPlayer = GameManager.Instance.currentPlayer; // Who has turn
 
         SendMessage(gameMsg);
     }

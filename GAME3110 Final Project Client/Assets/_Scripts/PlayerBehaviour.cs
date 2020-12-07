@@ -20,23 +20,36 @@ public class PlayerBehaviour : MonoBehaviour
     GameObject scoreLabel;
     public UI ui;
 
-    public GameObject scores;
+    [SerializeField]
+    private GameObject scores;
 
-    private void Start()
+    private void Awake()
     {
         ui = GameObject.Find("UI").gameObject.GetComponent<UI>();
 
+        //SetPlayerProfileUI();
+    }
+
+    public void SetPlayerProfileUI()
+    {
         // Setup Game Objects by finding them in the scene
         scoreLabel = ui.scoreLabel;
 
         // Instantiate the score label so that new players will have their score go underneath the previous
         scores = Instantiate(scoreLabelPrefab, ui.scoreLabel.transform);
-        scores.GetComponent<RectTransform>().position += new Vector3(0, (id - 1) * 0.01f);
+        scores.GetComponent<RectTransform>().position += new Vector3(0, (id - 1));
+    }
+
+    public void DisplayScore()
+    {
+        scores.GetComponent<TextMeshProUGUI>().text = (cumulativeScore + roundScore).ToString();
     }
 
     // Update is called once per frame
     void Update()
     {
+        DisplayScore();
+
         if (!hasTurn)
         {
             return;
@@ -44,7 +57,7 @@ public class PlayerBehaviour : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            ui.SubmitLetter(this);
+            ui.SubmitLetter();
         }
     }
 }

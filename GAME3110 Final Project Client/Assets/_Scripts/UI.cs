@@ -77,8 +77,10 @@ public class UI : MonoBehaviour
         loseTurn.AddListener(action);
     }
 
-    public void SubmitLetter(PlayerBehaviour player)
+    public void SubmitLetter()
     {
+        PlayerBehaviour player = GameManager.Instance.players[GameManager.Instance.currentPlayer];
+
         if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.SPIN))
         {
             return;
@@ -99,7 +101,7 @@ public class UI : MonoBehaviour
                 tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
             }
             // Show player's current score
-            player.scores.GetComponent<TextMeshProUGUI>().text = (player.cumulativeScore + player.roundScore).ToString();
+            player.DisplayScore();
 
             tmpSolveField.text = "";
             tmpInputField.Select();
@@ -130,7 +132,7 @@ public class UI : MonoBehaviour
                 }
 
                 // Show player's current score
-                player.scores.GetComponent<TextMeshProUGUI>().text = (player.cumulativeScore + player.roundScore).ToString();
+                player.DisplayScore();
 
                 tmpInputField.text = "";
                 tmpInputField.Select();
