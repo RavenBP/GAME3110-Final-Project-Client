@@ -33,7 +33,7 @@ def ConnectionLoop(sock, playersInMatch):
 
 			elif data['command'] == 'gameUpdate':
 				# Json format: { 'command': '', 'uid': '', 'orderid': 0, 'state': '', 'letterGuess': '', 'solveGuess': '', 'score': 0}
-				PlayerGameDataUpdate(data, userid)
+				PlayerGameDataUpdate(data, userid, sock)
 
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
@@ -68,7 +68,7 @@ def CreatePlayerGameData(addr, userid):
 	print("Players in match: ")
 	print(players)
 
-def PlayerGameDataUpdate(data, userid):
+def PlayerGameDataUpdate(data, userid, sock):
 	players_lock.acquire()
 
 	players[userid]['score'] = data['score']
@@ -79,20 +79,25 @@ def PlayerGameDataUpdate(data, userid):
 
 	players_lock.release()
 
+	ServerGameStateRelay(sock, userid)
+
 ################################################ Server Messaging
 
-def ServerGameStateRelay(sock):
-	while True:
+def ServerGameStateRelay(sock, userid):
+	#while True:
 
-		for player in players.values():
+	for player in players.values():
+		#if player['uid'] != userid:
+		gameStateMsg = {'players': []}
+		gameStateMsg['players'].append(player)
+		gameStateMsg["command"] = "update"
+		gameStateMsg = json.dumps(gameStateMsg)
 
-			gameStateMsg = {'players': []}
-			gameStateMsg['players'].append(player)
-			gameStateMsg["command"] = "update"
-			gameStateMsg = json.dumps(gameStateMsg)
+		address = player['addr']
+		sock.sendto(bytes(gameStateMsg, 'utf8'), address)
 
-			address = player['addr']
-			sock.sendto(bytes(gameStateMsg, 'utf8'), address)
+		print("Sent ")
+		print(gameStateMsg)
 
 ################################################ Start Match
 
@@ -100,7 +105,7 @@ def StartMatchLoop(sock):
 	print("Match started")
 
 	start_new_thread(ConnectionLoop,(sock,{'0':{}},))
-	start_new_thread(ServerGameStateRelay,(sock,))
+	#start_new_thread(ServerGameStateRelay,(sock,))
 
 ################################################ Test Code
 

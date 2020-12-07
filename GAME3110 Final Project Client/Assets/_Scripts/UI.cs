@@ -86,6 +86,8 @@ public class UI : MonoBehaviour
 
         if (solve.activeInHierarchy && GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.SOLVE))
         {
+            guessSolve = tmpSolveField.text;
+
             if (!display.Solve(tmpSolveField.text, ref player))
             {
                 LoseTurn();
