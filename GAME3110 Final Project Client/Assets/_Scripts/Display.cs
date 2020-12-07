@@ -32,8 +32,7 @@ public class Display : MonoBehaviour
 
     // Words data
     public WordBank wordBank = new WordBank();
-    // Index of current Word in WordBank array
-    private int curIndex = -1;
+
     // Keep track of remaining words
     private List<int> remainingWordsIndices = new List<int>();
 
@@ -45,7 +44,7 @@ public class Display : MonoBehaviour
     void Start()
     {
         LoadWords();
-        Setup();
+        //Setup();
         //Debug.Log(wordBank.Words.Length);
     }
 
@@ -143,7 +142,7 @@ public class Display : MonoBehaviour
     IEnumerator Solved()
     {
         yield return new WaitForSeconds(0.5f);
-        Setup();
+        //Setup();
         reveal = false;
         isNextRoundStarting = false;
     }
@@ -181,25 +180,23 @@ public class Display : MonoBehaviour
         // Create Words data
         wordBank._InstantiateWorld();
         // Initiate list of ramaining words by indices
-        for(int i = 0; i < wordBank.Words.Length; i++)
+        for(int i = 0; i < wordBank.Words.Count; i++)
         {
             remainingWordsIndices.Add(i);
         }
     }
-    private void Setup()
+
+    public void Setup(int wordIndex)
     {
         _Reset();
 
-        StartCoroutine(SelectNewWord());
-
-        // Remove chosen word from remaining words pool
-        remainingWordsIndices.Remove(curIndex);
-
         // Show word hint on game scene
         question.faceColor = new Color32(253, 26, 26, 255);
-        question.text = wordBank.Words[curIndex].question;
+        question.text = wordBank.Words[wordIndex].question;
 
-        originalPhrase = wordBank.Words[curIndex].answer;
+        originalPhrase = wordBank.Words[wordIndex].answer;
+
+        wordBank.Words.RemoveAt(wordIndex);
 
         solution = originalPhrase.ToCharArray();
 
@@ -250,17 +247,6 @@ public class Display : MonoBehaviour
             // The key is the alphabet
             charToIndexDict[noSpaces[i]].Add(i);
         }
-    }
-
-    private IEnumerator SelectNewWord()
-    {
-        // Choose playing word randomly but should be in remaining words pool
-        do
-        {
-            curIndex = UnityEngine.Random.Range(0, wordBank.Words.Length);
-
-            yield return null;
-        } while (remainingWordsIndices.Contains(curIndex) == false);
     }
 
     // Init Panels

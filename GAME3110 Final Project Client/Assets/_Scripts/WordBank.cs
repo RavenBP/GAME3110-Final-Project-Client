@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct WordPack
+public class WordPack
 {
     public string question;
     public string answer;
@@ -11,10 +11,15 @@ public struct WordPack
 // Temporary Words Database
 public class WordBank
 {
-    public WordPack[] Words = new WordPack[12];
+    public List<WordPack> Words = new List<WordPack>(12);
 
     public void _InstantiateWorld()
     {
+        for (int i = 0; i < Words.Capacity; i++)
+        {
+            Words.Add(new WordPack());
+        }
+
         Words[0].question = "Canada's city";
         Words[0].answer = "Toronto";
 

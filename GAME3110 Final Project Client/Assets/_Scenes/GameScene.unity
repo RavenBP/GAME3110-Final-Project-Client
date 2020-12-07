@@ -1552,7 +1552,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &590419741
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2409,7 +2409,8 @@ MonoBehaviour:
   gameState:
     command: 
     uid: 
-    players: []
+    wordIndex: 0
+    currentPlayer: 0
   ui: {fileID: 206473345}
 --- !u!4 &1289028769
 Transform:
@@ -3141,13 +3142,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 7874035849047319267, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
+  playerDebug: []
   clientPlayer: {fileID: 0}
   currentPlayer: 0
   ui: {fileID: 206473345}
-  display: {fileID: 0}
   gamePhaseManager: {fileID: 1478406710}
   roulette: {fileID: 1267479694}
   state: 
+  wordIndex: 0
+  display: {fileID: 590419740}
 --- !u!4 &1478406709
 Transform:
   m_ObjectHideFlags: 0
@@ -3198,7 +3201,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1483865272
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4472,7 +4475,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2025589608
 RectTransform:
   m_ObjectHideFlags: 0

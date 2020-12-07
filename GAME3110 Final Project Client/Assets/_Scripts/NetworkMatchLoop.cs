@@ -19,18 +19,18 @@ public class NetworkMatchLoop : MonoBehaviour
     public class Player : Message
     {
         public int orderid; // Turn order
-        public string state; // Another turn or lose turn
+        public GameState state; // Another turn or lose turn
         public string letterGuess;
         public string solveGuess;
         public int roundScore;
         public int cumulativeScore;
-        public int currentPlayer;
     }
 
     [Serializable]
     public class GameState : Message
     {
-        public Player[] players;
+        public int wordIndex;
+        public int currentPlayer;
     }
 
     public UdpClient udp;
@@ -90,9 +90,14 @@ public class NetworkMatchLoop : MonoBehaviour
         {
             switch (latestMessage.command)
             {
+                case "startGame":
+                    GameState gameState = JsonUtility.FromJson<GameState>(returnData);
+                    GameManager.Instance.wordIndex = gameState.wordIndex;
+
+                    break;
+
                 case "newPlayer":
                     playersToAdd.Enqueue(JsonUtility.FromJson<Player>(returnData));
-                    //Debug.Log("New Player: " + playerToAdd.uid);
                     break;
 
                 case "update":
@@ -153,10 +158,8 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.roundScore = GameManager.Instance.clientPlayer.roundScore;
         gameMsg.cumulativeScore = GameManager.Instance.clientPlayer.cumulativeScore; // Players score according to the UI label
         gameMsg.orderid = GameManager.Instance.clientPlayer.id; // ID inside the game, not profile id
-        gameMsg.state = GameManager.Instance.state; 
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
-        gameMsg.currentPlayer = GameManager.Instance.currentPlayer; // Who has turn
 
         SendMessage(gameMsg);
     }

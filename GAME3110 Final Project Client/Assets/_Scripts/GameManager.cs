@@ -29,12 +29,14 @@ public class GameManager : MonoBehaviour
     public int currentPlayer = 0;
     public UI ui;
 
-    public Display display;
-
     public GamePhases gamePhaseManager;
     public Roulette roulette;
 
     public string state;
+    public int wordIndex = -1;
+
+    public Display display;
+    public bool gameStart = false;
 
     // Start is called before the first frame update
     void Start()
@@ -76,6 +78,11 @@ public class GameManager : MonoBehaviour
         playerDebug.Add(newPlayer.GetComponent<PlayerBehaviour>());
     }
 
+    public bool CheckHasTurn()
+    {
+        return clientPlayer.id == currentPlayer;
+    }
+
     // Hand turn to next player in list
     void GiveTurn()
     {
@@ -90,5 +97,14 @@ public class GameManager : MonoBehaviour
         }
 
         ui.EnableInput();
+    }
+
+    private void Update()
+    {
+        if (gameStart == false && wordIndex != -1 && display.wordBank != null)
+        {
+            gameStart = true;
+            display.Setup(wordIndex);
+        }
     }
 }

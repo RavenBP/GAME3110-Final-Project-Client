@@ -1,3 +1,4 @@
+import random
 import socket
 import time
 from _thread import *
@@ -9,6 +10,8 @@ players = {}
 players_lock = threading.Lock()
 
 heartbeats = {}
+
+gameState = {}
 
 ################################################ Checking Players' Connections
 
@@ -60,6 +63,8 @@ def CreatePlayerGameData(addr, userid, sock):
 	gameData['solveGuess'] = ''
 	gameData['roundScore'] = 0
 	gameData['cumulativeScore'] = 0
+	gameData['wordIndex'] = gameState['currentWord']
+	gameData['currentPlayer'] = gameState['currentPlayer']
 
 	heartbeats[userid] = datetime.now()
 
@@ -80,6 +85,9 @@ def CreatePlayerGameData(addr, userid, sock):
 		
 			sock.sendto(bytes(msg, 'utf8'), address)
 
+	# Signal Player to begin game
+	StartGameSignal(sock, addr)
+
 	print("Players in match: ")
 	print(players)
 
@@ -96,6 +104,17 @@ def PlayerGameDataUpdate(data, userid, sock):
 	players_lock.release()
 
 	ServerGameStateRelay(sock, userid)
+
+#Pregame setup, basically who begins game, what is the word
+#Should be called for each new player and after each round
+def StartGameSignal(sock, addr):
+	startMsg = {}
+	startMsg['command'] = 'startGame'
+	startMsg['wordIndex'] = gameState['currentWord']
+	startMsg['currentPlayer'] = gameState['currentPlayer']
+	msg = json.dumps(startMsg)
+		
+	sock.sendto(bytes(msg, 'utf8'), addr)
 
 ################################################ Server Messaging
 
@@ -121,6 +140,12 @@ def ServerGameStateRelay(sock, userid):
 
 def StartMatchLoop(sock):
 	print("Match started")
+
+	gameState['currentPlayer'] = 0
+	gameState['remaingWords'] = 12
+
+	# Generate random word
+	gameState['currentWord'] = random.randint(0, gameState['remaingWords'])
 
 	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}},))
 	#start_new_thread(ServerGameStateRelay,(sock,))
