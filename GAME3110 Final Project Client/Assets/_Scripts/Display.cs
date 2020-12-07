@@ -151,6 +151,11 @@ public class Display : MonoBehaviour
     // Reset some variables to initial values to start a new round
     private void _Reset()
     {
+        if (GameManager.Instance.clientPlayer == null)
+        {
+            return;
+        }
+
         // Add up round score and reset it
         GameManager.Instance.clientPlayer.cumulativeScore += GameManager.Instance.clientPlayer.roundScore;
         GameManager.Instance.clientPlayer.roundScore = 0;

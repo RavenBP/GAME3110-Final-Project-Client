@@ -37,8 +37,9 @@ public class NetworkMatchLoop : MonoBehaviour
     public Message latestMessage;
     public GameState gameState;
 
-    public PlayerBehaviour player;
     public UI ui;
+
+    private Queue<Player> playersToAdd; // Temporary variable to add to game
 
     // TODO: REMOVE AFTER INTEGRATION
     private void Start()
@@ -49,6 +50,8 @@ public class NetworkMatchLoop : MonoBehaviour
     // Start connection to match socket
     public void StartMatchConnection(int matchPort)
     {
+        playersToAdd = new Queue<Player>();
+
         udp = new UdpClient();
 
         //udp.Connect("3.130.200.122", matchPort);
@@ -85,9 +88,13 @@ public class NetworkMatchLoop : MonoBehaviour
         {
             switch (latestMessage.command)
             {
+                case "newPlayer":
+                    playersToAdd.Enqueue(JsonUtility.FromJson<Player>(returnData));
+                    //Debug.Log("New Player: " + playerToAdd.uid);
+                    break;
+
                 case "update":
                     gameState = JsonUtility.FromJson<GameState>(returnData);
-                    Debug.Log(gameState.players[0].score);
                     break;
 
                 default:
@@ -121,12 +128,17 @@ public class NetworkMatchLoop : MonoBehaviour
 
     void SendGameUpdate()
     {
+        if (GameManager.Instance.clientPlayer == null)
+        {
+            return;
+        }
+
         Player gameMsg = new Player();
 
         gameMsg.uid = uid;
         gameMsg.command = "gameUpdate";
 
-        gameMsg.score = player.cumulativeScore + player.roundScore; // Players score according to the UI label
+        gameMsg.score = GameManager.Instance.clientPlayer.cumulativeScore + GameManager.Instance.clientPlayer.roundScore; // Players score according to the UI label
         gameMsg.orderid = GameManager.Instance.currentPlayer; // ID inside the game, not profile id
         gameMsg.state = GameManager.Instance.state; 
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
@@ -135,9 +147,19 @@ public class NetworkMatchLoop : MonoBehaviour
         SendMessage(gameMsg);
     }
 
+    // Adding this because I can't instantiate Prefabs outside of the main thread (i.e. Update(), Awake(), Start())
+    void AddPlayer()
+    {
+        if (playersToAdd.Count > 0)
+        {
+            GameManager.Instance.AddPlayerToGame(playersToAdd.Dequeue(), uid);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
+        AddPlayer();
         HeartBeat();
         SendGameUpdate();
     }

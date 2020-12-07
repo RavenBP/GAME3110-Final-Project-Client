@@ -1759,17 +1759,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 718533477}
   m_CullTransparentMesh: 0
---- !u!114 &893730635 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7874035849047319266, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
-  m_PrefabInstance: {fileID: 7874035848833736105}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0ddfb57e1c0cb84abaa7c275f428970, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1167456252
 GameObject:
   m_ObjectHideFlags: 0
@@ -2421,7 +2410,6 @@ MonoBehaviour:
     command: 
     uid: 
     players: []
-  player: {fileID: 893730635}
   ui: {fileID: 206473345}
 --- !u!4 &1289028769
 Transform:
@@ -2623,7 +2611,7 @@ MonoBehaviour:
         m_MethodName: SubmitLetter
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 893730635}
+          m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: PlayerBehaviour, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
@@ -3152,9 +3140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 680e92bbc06f25e44bb7e9513dc701a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players:
-  - {fileID: 893730635}
-  clientPlayer: {fileID: 893730635}
+  playerPrefab: {fileID: 7874035849047319267, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
+  clientPlayer: {fileID: 0}
+  currentPlayer: 0
   ui: {fileID: 206473345}
   display: {fileID: 0}
   gamePhaseManager: {fileID: 1478406710}
@@ -4860,9 +4848,17 @@ PrefabInstance:
       propertyPath: scoreLabelPrefab
       value: 
       objectReference: {fileID: 6150503222561206285, guid: c7c23402ce4950a4ebb0b7e5938b764c, type: 3}
+    - target: {fileID: 7874035849047319266, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
+      propertyPath: hasTurn
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7874035849047319267, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7874035849047319267, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7874035849047319269, guid: 23e5fae5efa943048bb897a0b8fffafb, type: 3}
       propertyPath: m_LocalPosition.x
