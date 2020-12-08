@@ -12,6 +12,8 @@ players_lock = threading.Lock()
 heartbeats = {}
 gameState = {}
 
+rounds = 3;
+
 ################################################ Checking Players' Connections
 
 # For waiting for players to enter room
@@ -151,6 +153,8 @@ def HandleRoundEnd(sock):
 	gameState['beginRoundRollcall'] += 1
 	if gameState['beginRoundRollcall'] >= len(players):
 		gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
+		gameState['roundsLeft'] -= 1
+		print(gameState['roundsLeft'])
 
 		for player in players.values():
 			gameState['currentPlayer'] = random.randint(0, len(players) - 1)
@@ -188,6 +192,7 @@ def StartMatchLoop(sock):
 
 	gameState['currentPlayer'] = 0
 	gameState['remaingWords'] = 12
+	gameState['roundsLeft'] = 3
 
 	# Generate random word
 	gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)

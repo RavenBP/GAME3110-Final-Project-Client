@@ -35,7 +35,7 @@ public class NetworkMatchLoop : MonoBehaviour
     public class Player : Message
     {
         public int orderid; // Turn order
-        public GameState state; // Another turn or lose turn
+        public int state; // Another turn or lose turn
         public string letterGuess;
         public string solveGuess;
         public int roundScore;
@@ -136,12 +136,19 @@ public class NetworkMatchLoop : MonoBehaviour
                             GameManager.Instance.otherPlayerSolution = playerUpdate.solveGuess;
                             GameManager.Instance.otherPlayerSolving = true;
                         }
+
+                        // Only if other player has turn
+                        if (GameManager.Instance.currentPlayer == playerUpdate.orderid)
+                        {
+                            GameManager.Instance.gamePhaseManager.SetPhase((GamePhase)playerUpdate.state);
+                        }
                     }
 
                     break;
 
                 case "switchTurn":
                     gameState = JsonUtility.FromJson<GameState>(returnData);
+                    GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
                     GameManager.Instance.currentPlayer = gameState.currentPlayer;
                     GameManager.Instance.TakeTurn();
 
@@ -193,6 +200,8 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.orderid = GameManager.Instance.clientPlayer.id; // ID inside the game, not profile id
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
+
+        gameMsg.state = (int)GameManager.Instance.gamePhaseManager.phase;
 
         SendMessage(gameMsg);
     }

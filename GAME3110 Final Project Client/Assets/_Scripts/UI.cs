@@ -161,6 +161,7 @@ public class UI : MonoBehaviour
     public void DisableInput()
     {
         tmpInputField.interactable = false;
+        tmpSolveField.interactable = false;
         submitButton.interactable = false;
 
         foreach (Button button in interactableButtons)
@@ -172,6 +173,7 @@ public class UI : MonoBehaviour
     public void EnableInput()
     {
         tmpInputField.interactable = true;
+        tmpSolveField.interactable = true;
         submitButton.interactable = true;
 
         foreach (Button button in interactableButtons)

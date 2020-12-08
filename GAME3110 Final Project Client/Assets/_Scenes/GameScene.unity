@@ -615,6 +615,7 @@ MonoBehaviour:
   interactableButtons:
   - {fileID: 1193034186}
   - {fileID: 1819776076}
+  - {fileID: 718533479}
 --- !u!1 &215781643
 GameObject:
   m_ObjectHideFlags: 0
@@ -1616,6 +1617,9 @@ MonoBehaviour:
   missedLetters: {fileID: 215781645}
   letterPrefab: {fileID: 650754678436605298, guid: 577fe0888cd00b34d9f3dff3a7585730, type: 3}
   reveal: 0
+  onPuzzleSolved:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &590419744
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -35,6 +35,12 @@ public class Roulette : MonoBehaviour
         }
     }
 
+    // Called Externally 
+    public void ExternalSpin()
+    {
+        StartCoroutine(Spin());
+    }
+
     bool spinning = false;
     bool alreadySpinning = false;
     public IEnumerator Spin()
@@ -69,16 +75,16 @@ public class Roulette : MonoBehaviour
     {
         if ((int)randomValue == 0)
         {
-            ui.LoseTurn();
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
+            ui.LoseTurn();
         }
         else if ((int)randomValue == -1)
         {
             Debug.Log("BANKRUPT");
-            ui.LoseTurn();
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
             GameManager.Instance.clientPlayer.roundScore = 0;
             GameManager.Instance.clientPlayer.DisplayScore();
+            ui.LoseTurn();
         }
 
         return (int)randomValue;
