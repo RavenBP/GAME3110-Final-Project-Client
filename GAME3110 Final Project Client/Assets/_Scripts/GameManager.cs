@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
     public Display display;
     public bool gameStart = false;
     public bool otherPlayerGuessing = false;
+    public bool clientHasTurn = false;
     public char otherPlayerGuess;
 
     // Start is called before the first frame update
@@ -99,6 +100,15 @@ public class GameManager : MonoBehaviour
         }
 
         ui.DisableInput();
+        NetworkMatchLoop.Instance.SendLoseTurnMessage(currentPlayer);
+    }
+
+    public void TakeTurn()
+    {
+        if (CheckHasTurn())
+        {
+            clientHasTurn = true;
+        }
     }
 
     // Handle remote gameplay
@@ -116,6 +126,12 @@ public class GameManager : MonoBehaviour
             PlayerBehaviour player = players[currentPlayer];
             GameManager.Instance.display.MakeGuess(otherPlayerGuess, ref player, 0);
             otherPlayerGuessing = false;
+        }
+
+        if (clientHasTurn)
+        {
+            ui.EnableInput();
+            clientHasTurn = false;
         }
     }
 }

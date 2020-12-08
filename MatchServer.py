@@ -50,8 +50,10 @@ def ConnectionLoop(sock, playersInMatch):
 			elif data['command'] == 'quit':
 				print(0)
 
+			# Just pass the message on to everyone else
 			elif data['command'] == 'loseTurn':
-				print(0)
+				print("Lose Turn")
+				PassTurn(sock, data)
 
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
@@ -130,6 +132,15 @@ def StartGameSignal(sock, addr):
 	msg = json.dumps(startMsg)
 		
 	sock.sendto(bytes(msg, 'utf8'), addr)
+
+def PassTurn(sock, passTurnMsg):
+
+	for player in players.values():
+		passTurnMsg['command'] = 'switchTurn'
+		msg = json.dumps(passTurnMsg)
+
+		addr = player['addr']
+		sock.sendto(bytes(msg, 'utf8'), addr)
 
 ################################################ Server Messaging
 

@@ -8,6 +8,22 @@ using System.Net;
 
 public class NetworkMatchLoop : MonoBehaviour
 {
+    private static NetworkMatchLoop instance;
+
+    public static NetworkMatchLoop Instance { get { return instance; } }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+    }
+
     [Serializable]
     public class Message
     {
@@ -37,7 +53,6 @@ public class NetworkMatchLoop : MonoBehaviour
     public string uid; // TODO: REMOVE AFTER INTEGRATION
 
     public Message latestMessage;
-    public GameState gameState;
 
     public UI ui;
 
@@ -120,6 +135,13 @@ public class NetworkMatchLoop : MonoBehaviour
 
                     break;
 
+                case "switchTurn":
+                    gameState = JsonUtility.FromJson<GameState>(returnData);
+                    GameManager.Instance.currentPlayer = gameState.currentPlayer;
+                    GameManager.Instance.TakeTurn();
+
+                    break;
+
                 default:
                     Debug.Log("Error");
                     break;
@@ -168,6 +190,16 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
 
         SendMessage(gameMsg);
+    }
+
+    public void SendLoseTurnMessage(int currentPlayer)
+    {
+        GameState gameStateMsg = new GameState();
+
+        gameStateMsg.command = "loseTurn";
+        gameStateMsg.currentPlayer = currentPlayer;
+
+        SendMessage(gameStateMsg);
     }
 
     // Adding this because I can't instantiate Prefabs outside of the main thread (i.e. Update(), Awake(), Start())
