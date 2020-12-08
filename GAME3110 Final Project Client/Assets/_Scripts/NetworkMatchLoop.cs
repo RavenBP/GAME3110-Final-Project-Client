@@ -207,6 +207,15 @@ public class NetworkMatchLoop : MonoBehaviour
         SendMessage(gameStateMsg);
     }
 
+    public void SendRoundEndMessage()
+    {
+        GameState gameStateMsg = new GameState();
+
+        gameStateMsg.command = "roundEnd";
+
+        SendMessage(gameStateMsg);
+    }
+
     // Adding this because I can't instantiate Prefabs outside of the main thread (i.e. Update(), Awake(), Start())
     void AddPlayer()
     {

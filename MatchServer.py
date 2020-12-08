@@ -10,7 +10,6 @@ players = {}
 players_lock = threading.Lock()
 
 heartbeats = {}
-
 gameState = {}
 
 ################################################ Checking Players' Connections
@@ -18,6 +17,8 @@ gameState = {}
 # For waiting for players to enter room
 # and to check for connection drops
 def ConnectionLoop(sock, playersInMatch):
+	gameState['beginRoundRollcall'] = 0
+
 	while True:
 		data, addr = sock.recvfrom(1024)
 		data = json.loads(data)
@@ -40,7 +41,8 @@ def ConnectionLoop(sock, playersInMatch):
 
 			# Puzzle solved, start next round
 			elif data['command'] == 'roundEnd':
-				print(0)
+				print("Round End")
+				HandleRoundEnd(sock);
 
 			# All rounds finished, go back to lobby
 			elif data['command'] == 'matchEnd':
@@ -142,6 +144,23 @@ def PassTurn(sock, passTurnMsg):
 		addr = player['addr']
 		sock.sendto(bytes(msg, 'utf8'), addr)
 
+def HandleRoundEnd(sock):
+	# Should only accept one round end message from all clients instead of from each
+
+	# Wait for all players to confirm round ended
+	gameState['beginRoundRollcall'] += 1
+	if gameState['beginRoundRollcall'] >= len(players):
+		gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
+
+		for player in players.values():
+			gameState['currentPlayer'] = random.randint(0, len(players) - 1)
+			gameState['remaingWords'] = gameState['remaingWords'] - 1
+
+			StartGameSignal(sock, player['addr'])
+
+		# Reset Roll
+		gameState['beginRoundRollcall'] = 0
+
 ################################################ Server Messaging
 
 def ServerGameStateRelay(sock, userid):
@@ -172,6 +191,7 @@ def StartMatchLoop(sock):
 
 	# Generate random word
 	gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
+	gameState['remaingWords'] = gameState['remaingWords'] - 1
 
 	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}},))
 	#start_new_thread(ServerGameStateRelay,(sock,))

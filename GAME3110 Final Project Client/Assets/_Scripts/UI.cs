@@ -30,6 +30,12 @@ public class UI : MonoBehaviour
 
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
+    private void Start()
+    {
+        // Players are instantiated dynamically, so by default it is null in the inspector
+        submitButton.GetComponent<Button>().onClick.AddListener(SubmitLetter);
+    }
+
     public void Login()
     {
         if (usernames.Contains(tmpInputField.text)) // Entered username exists within known usernames

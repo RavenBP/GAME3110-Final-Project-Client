@@ -612,6 +612,9 @@ MonoBehaviour:
   guess: {fileID: 278554415}
   guessChar: 0
   guessSolve: 
+  interactableButtons:
+  - {fileID: 1193034186}
+  - {fileID: 1819776076}
 --- !u!1 &215781643
 GameObject:
   m_ObjectHideFlags: 0
@@ -1552,7 +1555,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &590419741
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2406,11 +2409,6 @@ MonoBehaviour:
   latestMessage:
     command: 
     uid: 
-  gameState:
-    command: 
-    uid: 
-    wordIndex: 0
-    currentPlayer: 0
   ui: {fileID: 206473345}
 --- !u!4 &1289028769
 Transform:
@@ -3150,7 +3148,13 @@ MonoBehaviour:
   roulette: {fileID: 1267479694}
   state: 
   wordIndex: 0
-  display: {fileID: 590419740}
+  display: {fileID: 590419743}
+  gameStart: 0
+  otherPlayerGuessing: 0
+  otherPlayerSolving: 0
+  clientHasTurn: 0
+  otherPlayerGuess: 0
+  otherPlayerSolution: 
 --- !u!4 &1478406709
 Transform:
   m_ObjectHideFlags: 0

@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         ui.AddLoseTurnListener(GiveTurn);
+        display.onPuzzleSolved.AddListener(FinishRound);
         players = new Dictionary<int, PlayerBehaviour>();
         //for (int i = 0; i < players.Count; i++) 
         //{
@@ -113,6 +114,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void FinishRound()
+    {
+        if (gameStart)
+        {
+            // Need new word from server
+            NetworkMatchLoop.Instance.SendRoundEndMessage();
+            gameStart = false; // Game paused
+            wordIndex = -1;
+        }
+    }
+
     // Handle remote gameplay
     private void Update()
     {
@@ -120,6 +132,7 @@ public class GameManager : MonoBehaviour
         {
             gameStart = true;
             display.Setup(wordIndex);
+            display.StartNextRound();
         }
 
         // Remote guess

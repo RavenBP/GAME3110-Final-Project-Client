@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using System;
 
 public class Display : MonoBehaviour
@@ -40,6 +41,8 @@ public class Display : MonoBehaviour
 
     public bool reveal = false;
 
+    public UnityEvent onPuzzleSolved;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,7 +51,7 @@ public class Display : MonoBehaviour
         //Debug.Log(wordBank.Words.Length);
     }
 
-    bool isNextRoundStarting = false;
+    bool isNextRoundStarting = true;
 
     // Update is called once per frame
     void Update()
@@ -130,7 +133,7 @@ public class Display : MonoBehaviour
             PlayerInfo.numWins++;
             reveal = true;
 
-            StartCoroutine(Solved());
+            remainingCorrectLetters.Clear(); // Don't want two Coroutines running, have the Update loop handle it by clearing the letter list
 
             return true;
         }
@@ -142,7 +145,12 @@ public class Display : MonoBehaviour
     IEnumerator Solved()
     {
         yield return new WaitForSeconds(0.5f);
-        //Setup();
+        onPuzzleSolved.Invoke(); // Tell GameManager that the round ended and it should talk to the server.
+    }
+
+    // To sync up with GameManager, because they talk to the server quickly, have the the GameManager start the next round instead
+    public void StartNextRound()
+    {
         reveal = false;
         isNextRoundStarting = false;
     }
