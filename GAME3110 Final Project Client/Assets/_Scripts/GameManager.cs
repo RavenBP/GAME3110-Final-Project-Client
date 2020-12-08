@@ -38,8 +38,10 @@ public class GameManager : MonoBehaviour
     public Display display;
     public bool gameStart = false;
     public bool otherPlayerGuessing = false;
+    public bool otherPlayerSolving = false;
     public bool clientHasTurn = false;
     public char otherPlayerGuess;
+    public string otherPlayerSolution;
 
     // Start is called before the first frame update
     void Start()
@@ -125,6 +127,14 @@ public class GameManager : MonoBehaviour
         {
             PlayerBehaviour player = players[currentPlayer];
             GameManager.Instance.display.MakeGuess(otherPlayerGuess, ref player, 0);
+            otherPlayerGuessing = false;
+        }
+
+        // Remote solve
+        if (otherPlayerSolving)
+        {
+            PlayerBehaviour player = players[currentPlayer];
+            GameManager.Instance.display.Solve(otherPlayerSolution, ref player);
             otherPlayerGuessing = false;
         }
 

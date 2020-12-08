@@ -131,6 +131,11 @@ public class NetworkMatchLoop : MonoBehaviour
                             GameManager.Instance.otherPlayerGuess = playerUpdate.letterGuess[0];
                             GameManager.Instance.otherPlayerGuessing = true;
                         }
+                        else if (playerUpdate.solveGuess.Length > 0 && playerUpdate.solveGuess != GameManager.Instance.otherPlayerSolution)
+                        {
+                            GameManager.Instance.otherPlayerSolution = playerUpdate.solveGuess;
+                            GameManager.Instance.otherPlayerSolving = true;
+                        }
                     }
 
                     break;
