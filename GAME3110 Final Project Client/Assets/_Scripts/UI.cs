@@ -26,6 +26,8 @@ public class UI : MonoBehaviour
     public char guessChar;
     public string guessSolve;
 
+    public List<Button> interactableButtons;
+
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     public void Login()
@@ -154,12 +156,22 @@ public class UI : MonoBehaviour
     {
         tmpInputField.interactable = false;
         submitButton.interactable = false;
+
+        foreach (Button button in interactableButtons)
+        {
+            button.interactable = false;
+        }
     }
 
     public void EnableInput()
     {
         tmpInputField.interactable = true;
         submitButton.interactable = true;
+
+        foreach (Button button in interactableButtons)
+        {
+            button.interactable = true;
+        }
     }
 
     public void ViewAccount()

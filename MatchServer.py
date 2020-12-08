@@ -38,6 +38,21 @@ def ConnectionLoop(sock, playersInMatch):
 				# Json format: { 'command': '', 'uid': '', 'orderid': 0, 'state': '', 'letterGuess': '', 'solveGuess': '', 'roundScore': 0, 'cumulativeScore': 0}
 				PlayerGameDataUpdate(data, userid, sock)
 
+			# Puzzle solved, start next round
+			elif data['command'] == 'roundEnd':
+				print(0)
+
+			# All rounds finished, go back to lobby
+			elif data['command'] == 'matchEnd':
+				print(0)
+
+			# If someone leaves match, still treat it as a dropped player
+			elif data['command'] == 'quit':
+				print(0)
+
+			elif data['command'] == 'loseTurn':
+				print(0)
+
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
 	# Check if the player belongs in this match
@@ -145,7 +160,7 @@ def StartMatchLoop(sock):
 	gameState['remaingWords'] = 12
 
 	# Generate random word
-	gameState['currentWord'] = random.randint(0, gameState['remaingWords'])
+	gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
 
 	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}},))
 	#start_new_thread(ServerGameStateRelay,(sock,))

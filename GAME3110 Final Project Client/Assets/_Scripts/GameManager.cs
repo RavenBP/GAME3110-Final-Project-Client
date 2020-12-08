@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
 
     public Display display;
     public bool gameStart = false;
+    public bool otherPlayerGuessing = false;
+    public char otherPlayerGuess;
 
     // Start is called before the first frame update
     void Start()
@@ -96,15 +98,24 @@ public class GameManager : MonoBehaviour
             currentPlayer = 0;
         }
 
-        ui.EnableInput();
+        ui.DisableInput();
     }
 
+    // Handle remote gameplay
     private void Update()
     {
         if (gameStart == false && wordIndex != -1 && display.wordBank != null)
         {
             gameStart = true;
             display.Setup(wordIndex);
+        }
+
+        // Remote guess
+        if (otherPlayerGuessing)
+        {
+            PlayerBehaviour player = players[currentPlayer];
+            GameManager.Instance.display.MakeGuess(otherPlayerGuess, ref player, 0);
+            otherPlayerGuessing = false;
         }
     }
 }

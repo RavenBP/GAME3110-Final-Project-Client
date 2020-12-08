@@ -110,6 +110,12 @@ public class NetworkMatchLoop : MonoBehaviour
 
                         player.roundScore = playerUpdate.roundScore;
                         player.cumulativeScore = playerUpdate.cumulativeScore;
+                        
+                        if (playerUpdate.letterGuess.Length > 0 && playerUpdate.letterGuess[0] != GameManager.Instance.otherPlayerGuess)
+                        {
+                            GameManager.Instance.otherPlayerGuess = playerUpdate.letterGuess[0];
+                            GameManager.Instance.otherPlayerGuessing = true;
+                        }
                     }
 
                     break;
