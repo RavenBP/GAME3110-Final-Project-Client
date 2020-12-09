@@ -82,6 +82,7 @@ def CreatePlayerGameData(addr, userid, sock):
 	gameData['state'] = ''
 	gameData['letterGuess'] = ''
 	gameData['solveGuess'] = ''
+	gameData['spinPoints'] = 0
 	gameData['roundScore'] = 0
 	gameData['cumulativeScore'] = 0
 	gameData['wordIndex'] = gameState['currentWord']
@@ -119,6 +120,7 @@ def PlayerGameDataUpdate(data, userid, sock):
 	players[userid]['state'] = data['state']
 	players[userid]['letterGuess'] = data['letterGuess']
 	players[userid]['solveGuess'] = data['solveGuess']
+	players[userid]['spinPoints'] = data['spinPoints']
 	players[userid]['roundScore'] = data['roundScore']
 	players[userid]['cumulativeScore'] = data['cumulativeScore']
 

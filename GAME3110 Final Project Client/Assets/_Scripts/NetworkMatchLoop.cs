@@ -38,6 +38,7 @@ public class NetworkMatchLoop : MonoBehaviour
         public int state; // Another turn or lose turn
         public string letterGuess;
         public string solveGuess;
+        public int spinPoints;
         public int roundScore;
         public int cumulativeScore;
     }
@@ -140,7 +141,15 @@ public class NetworkMatchLoop : MonoBehaviour
                         // Only if other player has turn
                         if (GameManager.Instance.currentPlayer == playerUpdate.orderid)
                         {
+                            //GameManager.Instance.roulette.spinning = false;
                             GameManager.Instance.gamePhaseManager.SetPhase((GamePhase)playerUpdate.state);
+
+                            // Only in guess phase
+                            if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
+                            {
+                                GameManager.Instance.roulette.spinning = false;
+                                GameManager.Instance.spinResult = playerUpdate.spinPoints;
+                            }
                         }
                     }
 
@@ -200,6 +209,7 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.orderid = GameManager.Instance.clientPlayer.id; // ID inside the game, not profile id
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
+        gameMsg.spinPoints = GameManager.Instance.spinResult;
 
         gameMsg.state = (int)GameManager.Instance.gamePhaseManager.phase;
 

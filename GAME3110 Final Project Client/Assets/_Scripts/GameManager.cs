@@ -43,6 +43,8 @@ public class GameManager : MonoBehaviour
     public char otherPlayerGuess;
     public string otherPlayerSolution;
 
+    public int spinResult;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -110,6 +112,7 @@ public class GameManager : MonoBehaviour
     {
         if (CheckHasTurn())
         {
+            roulette.spinning = false;
             clientHasTurn = true;
         }
     }
@@ -155,6 +158,29 @@ public class GameManager : MonoBehaviour
         {
             ui.EnableInput();
             clientHasTurn = false;
+        }
+
+        if (gamePhaseManager.phase == GamePhase.SPIN && clientPlayer.id != currentPlayer && !roulette.spinning)
+        {
+            roulette.spinning = true;
+            roulette.ExternalSpin();
+        }
+
+        // Only in guess phase
+        if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS) && clientPlayer.id != currentPlayer)
+        {
+            switch (spinResult)
+            {
+                case 0:
+                    GameManager.Instance.roulette.display.text = "LOSE A TURN";
+                    break;
+                case -1:
+                    GameManager.Instance.roulette.display.text = "BANKRUPT";
+                    break;
+                default:
+                    GameManager.Instance.roulette.display.text = spinResult.ToString();
+                    break;
+            }
         }
     }
 }

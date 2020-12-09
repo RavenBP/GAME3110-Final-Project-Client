@@ -38,12 +38,22 @@ public class Roulette : MonoBehaviour
     // Called Externally 
     public void ExternalSpin()
     {
-        StartCoroutine(Spin());
+        spinning = true;
+        StartCoroutine(RouletteSpinEffect());
     }
 
-    bool spinning = false;
+    public bool spinning = false;
     bool alreadySpinning = false;
     public IEnumerator Spin()
+    {
+        yield return RouletteSpinEffect();
+
+        alreadySpinning = false;
+        GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.GUESS);
+        GetSpinResult();
+    }
+
+    public IEnumerator RouletteSpinEffect()
     {
         while (spinning)
         {
@@ -59,34 +69,31 @@ public class Roulette : MonoBehaviour
             // LOSETURN BANKRUPT Texts
             else
             {
-                display.faceColor = new Color32(251,38,11,255);
-                display.text = randomValue.ToString().Remove(randomValue.ToString().Length-1);
+                display.faceColor = new Color32(251, 38, 11, 255);
+                display.text = randomValue.ToString().Remove(randomValue.ToString().Length - 1);
             }
 
             yield return new WaitForSeconds(0.1f);
         }
-
-        alreadySpinning = false;
-        GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.GUESS);
-        GetSpinResult();
     }
 
     public int GetSpinResult()
     {
         if ((int)randomValue == 0)
         {
-            GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
             ui.LoseTurn();
+            GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
         }
         else if ((int)randomValue == -1)
         {
             Debug.Log("BANKRUPT");
+            ui.LoseTurn();
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
             GameManager.Instance.clientPlayer.roundScore = 0;
             GameManager.Instance.clientPlayer.DisplayScore();
-            ui.LoseTurn();
         }
 
+        GameManager.Instance.spinResult = (int)randomValue;
         return (int)randomValue;
     }
 }
