@@ -83,7 +83,16 @@ public class GamePhases : MonoBehaviour
     public void SetPhase(GamePhase _phase)
     {
         phase = _phase;
-        Debug.Log(phase);
+
+        if (GameManager.Instance.clientPlayer.id == GameManager.Instance.currentPlayer)
+        {
+            if (!CheckPhase(GamePhase.GUESS))
+            {
+                GameManager.Instance.ui.guessChar = '\0';
+                GameManager.Instance.ui.guessSolve = "";
+            }
+            NetworkMatchLoop.Instance.SendGameUpdate(); // Send everytime phase changes by client
+        }
     }
 
     public bool CheckPhase(GamePhase _phase)

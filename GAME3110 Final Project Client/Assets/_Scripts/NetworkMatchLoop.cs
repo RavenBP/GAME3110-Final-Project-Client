@@ -56,6 +56,7 @@ public class NetworkMatchLoop : MonoBehaviour
     public Message latestMessage;
 
     public UI ui;
+    public GamePhase currentPhase = GamePhase.SELECT;
 
     private Queue<Player> playersToAdd; // Temporary variable to add to game
 
@@ -109,6 +110,10 @@ public class NetworkMatchLoop : MonoBehaviour
                 case "startGame":
                     GameState gameState = JsonUtility.FromJson<GameState>(returnData);
                     GameManager.Instance.wordIndex = gameState.wordIndex;
+                    GameManager.Instance.hasRoundEnded = false;
+                    ui.guessChar = '\0';
+                    ui.guessSolve = "";
+                    SendGameUpdate(); // Start game confirmation plus message refresh
 
                     break;
 
@@ -127,12 +132,12 @@ public class NetworkMatchLoop : MonoBehaviour
                         player.roundScore = playerUpdate.roundScore;
                         player.cumulativeScore = playerUpdate.cumulativeScore;
                         
-                        if (playerUpdate.letterGuess.Length > 0 && playerUpdate.letterGuess[0] != GameManager.Instance.otherPlayerGuess)
+                        if (playerUpdate.letterGuess.Length > 0 && GameManager.Instance.currentPlayer == player.id)
                         {
                             GameManager.Instance.otherPlayerGuess = playerUpdate.letterGuess[0];
                             GameManager.Instance.otherPlayerGuessing = true;
                         }
-                        else if (playerUpdate.solveGuess.Length > 0 && playerUpdate.solveGuess != GameManager.Instance.otherPlayerSolution)
+                        else if (playerUpdate.solveGuess.Length > 0 && GameManager.Instance.currentPlayer == player.id)
                         {
                             GameManager.Instance.otherPlayerSolution = playerUpdate.solveGuess;
                             GameManager.Instance.otherPlayerSolving = true;
@@ -192,9 +197,9 @@ public class NetworkMatchLoop : MonoBehaviour
         SendMessage(heartMsg);
     }
 
-    void SendGameUpdate()
+    public void SendGameUpdate(bool emergency = false)
     {
-        if (GameManager.Instance.clientPlayer == null)
+        if (GameManager.Instance.clientPlayer == null || !GameManager.Instance.CheckHasTurn() && !emergency)
         {
             return;
         }
@@ -207,8 +212,12 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.roundScore = GameManager.Instance.clientPlayer.roundScore;
         gameMsg.cumulativeScore = GameManager.Instance.clientPlayer.cumulativeScore; // Players score according to the UI label
         gameMsg.orderid = GameManager.Instance.clientPlayer.id; // ID inside the game, not profile id
+
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
+
+        Debug.Log("SENDING MSG WITH GUESS: " + gameMsg.letterGuess);
+
         gameMsg.spinPoints = GameManager.Instance.spinResult;
 
         gameMsg.state = (int)GameManager.Instance.gamePhaseManager.phase;
@@ -235,6 +244,13 @@ public class NetworkMatchLoop : MonoBehaviour
         SendMessage(gameStateMsg);
     }
 
+    public void SendQuitMessage()
+    {
+        GameState gameStateMsg = new GameState();
+        gameStateMsg.command = "quit";
+        SendMessage(gameStateMsg);
+    }
+
     // Adding this because I can't instantiate Prefabs outside of the main thread (i.e. Update(), Awake(), Start())
     void AddPlayer()
     {
@@ -249,6 +265,5 @@ public class NetworkMatchLoop : MonoBehaviour
     {
         AddPlayer();
         HeartBeat();
-        SendGameUpdate();
     }
 }

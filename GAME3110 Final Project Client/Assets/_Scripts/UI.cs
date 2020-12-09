@@ -97,10 +97,11 @@ public class UI : MonoBehaviour
         if (solve.activeInHierarchy && GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.SOLVE))
         {
             guessSolve = tmpSolveField.text;
+            NetworkMatchLoop.Instance.SendGameUpdate(); // Send after each guess
 
             if (!display.Solve(tmpSolveField.text, ref player))
             {
-                LoseTurn();
+                StartCoroutine(LoseTurn());
             }
             else
             {
@@ -118,6 +119,8 @@ public class UI : MonoBehaviour
             guess.SetActive(true);
 
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
+
+            guessSolve = "";
         }
         else if (guess.activeInHierarchy && GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
         {
@@ -126,11 +129,12 @@ public class UI : MonoBehaviour
                 int scoreVal = GameManager.Instance.roulette.GetSpinResult();
 
                 guessChar = (tmpInputField.text.ToCharArray())[0];
+                NetworkMatchLoop.Instance.SendGameUpdate(); // Send after each guess
 
                 // Clears the guess
                 if (!display.MakeGuess(guessChar, ref player, scoreVal))
                 {
-                    LoseTurn();
+                    StartCoroutine(LoseTurn());
                 }
                 else
                 {
@@ -146,15 +150,18 @@ public class UI : MonoBehaviour
                 tmpInputField.Select();
 
                 GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
-                //Debug.Log("Player entered the letter: " + Guess.currentGuess);
+
+                guessChar = '\0';
             }
         }
     }
 
-    public void LoseTurn()
+    public IEnumerator LoseTurn()
     {
         Debug.Log("LOSE TURN");
         DisableInput();
+
+        yield return new WaitForSeconds(0.1f); // Delay for a short bit
         loseTurn.Invoke();
     }
 

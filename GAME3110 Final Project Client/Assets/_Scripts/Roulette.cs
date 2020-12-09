@@ -81,19 +81,20 @@ public class Roulette : MonoBehaviour
     {
         if ((int)randomValue == 0)
         {
-            ui.LoseTurn();
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
+            StartCoroutine(ui.LoseTurn());
         }
         else if ((int)randomValue == -1)
         {
             Debug.Log("BANKRUPT");
-            ui.LoseTurn();
             GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
             GameManager.Instance.clientPlayer.roundScore = 0;
             GameManager.Instance.clientPlayer.DisplayScore();
+            StartCoroutine(ui.LoseTurn());
         }
 
         GameManager.Instance.spinResult = (int)randomValue;
+        NetworkMatchLoop.Instance.SendGameUpdate(true);
         return (int)randomValue;
     }
 }

@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
 
     public string state;
     public int wordIndex = -1;
+    public int prevWordIndex = -1;
 
     public Display display;
     public bool gameStart = false;
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
     public string otherPlayerSolution;
 
     public int spinResult;
+    public bool hasRoundEnded = false; // Safety at the end of each round to make sure everyone is safe to proceed
 
     // Start is called before the first frame update
     void Start()
@@ -51,10 +53,6 @@ public class GameManager : MonoBehaviour
         ui.AddLoseTurnListener(GiveTurn);
         display.onPuzzleSolved.AddListener(FinishRound);
         players = new Dictionary<int, PlayerBehaviour>();
-        //for (int i = 0; i < players.Count; i++) 
-        //{
-        //    players[i].id = i + 1; 
-        //}
     }
 
     public void AddPlayerToGame(NetworkMatchLoop.Player player, string uid)
@@ -105,6 +103,8 @@ public class GameManager : MonoBehaviour
         }
 
         ui.DisableInput();
+
+        //NetworkMatchLoop.Instance.SendGameUpdate(true); // This is not immediately sent on bankrupt
         NetworkMatchLoop.Instance.SendLoseTurnMessage(currentPlayer);
     }
 
@@ -114,6 +114,7 @@ public class GameManager : MonoBehaviour
         {
             roulette.spinning = false;
             clientHasTurn = true;
+            //NetworkMatchLoop.Instance.SendGameUpdate(true);
         }
     }
 
@@ -125,17 +126,23 @@ public class GameManager : MonoBehaviour
             NetworkMatchLoop.Instance.SendRoundEndMessage();
             gameStart = false; // Game paused
             wordIndex = -1;
+            prevWordIndex = wordIndex;
         }
     }
 
     // Handle remote gameplay
     private void Update()
     {
-        if (gameStart == false && wordIndex != -1 && display.wordBank != null)
+        if (gameStart == false && wordIndex != prevWordIndex && display.wordBank != null)
         {
+            prevWordIndex = wordIndex;
             gameStart = true;
             display.Setup(wordIndex);
             display.StartNextRound();
+
+            // No one should be guessing
+            otherPlayerGuessing = false;
+            otherPlayerGuessing = false;
         }
 
         // Remote guess
@@ -144,6 +151,7 @@ public class GameManager : MonoBehaviour
             PlayerBehaviour player = players[currentPlayer];
             GameManager.Instance.display.MakeGuess(otherPlayerGuess, ref player, 0);
             otherPlayerGuessing = false;
+            ui.guessChar = '\0';
         }
 
         // Remote solve
@@ -152,6 +160,7 @@ public class GameManager : MonoBehaviour
             PlayerBehaviour player = players[currentPlayer];
             GameManager.Instance.display.Solve(otherPlayerSolution, ref player);
             otherPlayerGuessing = false;
+            ui.guessSolve = "";
         }
 
         if (clientHasTurn)

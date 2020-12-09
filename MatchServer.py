@@ -155,14 +155,15 @@ def HandleRoundEnd(sock):
 	gameState['beginRoundRollcall'] += 1
 	if gameState['beginRoundRollcall'] >= len(players):
 		gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
+		gameState['remaingWords'] = gameState['remaingWords'] - 1
+
 		gameState['roundsLeft'] -= 1
 		print(gameState['roundsLeft'])
 
 		for player in players.values():
-			gameState['currentPlayer'] = random.randint(0, len(players) - 1)
-			gameState['remaingWords'] = gameState['remaingWords'] - 1
-
 			StartGameSignal(sock, player['addr'])
+
+			print(player['addr'])
 
 		# Reset Roll
 		gameState['beginRoundRollcall'] = 0
@@ -200,7 +201,7 @@ def StartMatchLoop(sock):
 	gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
 	gameState['remaingWords'] = gameState['remaingWords'] - 1
 
-	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}},))
+	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}, '2':{}},))
 	#start_new_thread(ServerGameStateRelay,(sock,))
 
 ################################################ Test Code

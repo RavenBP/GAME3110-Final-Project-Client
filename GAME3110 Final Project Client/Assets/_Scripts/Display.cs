@@ -74,6 +74,8 @@ public class Display : MonoBehaviour
 
     public bool MakeGuess(char guess, ref PlayerBehaviour player, int scoreVal)
     {
+        Debug.Log(player.id + " IS MAKING GUESS WITH: " + guess.ToString());
+
         // Remove letter from remaining list when guessing correctly
         if (allLetters.Contains(char.ToUpper(guess)))
         {
@@ -81,11 +83,13 @@ public class Display : MonoBehaviour
             {
                 remainingCorrectLetters.Remove(char.ToUpper(guess));
 
-                // Add score when player guesses correctly, add bonus score when player opens whole word
-                player.roundScore += scoreVal * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+                if (GameManager.Instance.clientPlayer.id == player.id)
+                {
+                    // Add score when player guesses correctly, add bonus score when player opens whole word
+                    player.roundScore += scoreVal * charToIndexDict[char.ToUpper(guess)].Count; // Multiplier bonus
+                }
 
-
-                if (remainingCorrectLetters.Count <= 0) // All letters have been correctly guessed
+                if (remainingCorrectLetters.Count <= 0 && GameManager.Instance.clientPlayer.id == player.id) // All letters have been correctly guessed
                 {
                     player.roundScore += (int)Score.WHOLEWORDPOINT;
                     PlayerInfo.numWins++;
@@ -95,7 +99,7 @@ public class Display : MonoBehaviour
         // Add letter to wrong list when guessing wrong
         else
         {
-            if (!wrongLetters.Contains(char.ToUpper(guess)) && guess != ' ')
+            if (!wrongLetters.Contains(char.ToUpper(guess)) && (guess != ' ' || guess != '\0'))
             {
                 wrongLetters.Add(char.ToUpper(guess));
             }
@@ -129,7 +133,10 @@ public class Display : MonoBehaviour
     {
         if (originalPhrase == guess.ToUpper().Replace("\n", "") && !reveal)
         {
-            player.roundScore += (int)Score.WHOLEWORDPOINT;
+            if (GameManager.Instance.clientPlayer.id == player.id)
+            {
+                player.roundScore += (int)Score.WHOLEWORDPOINT;
+            }
             PlayerInfo.numWins++;
             reveal = true;
 
@@ -144,6 +151,7 @@ public class Display : MonoBehaviour
     // Delay next round so it is not too sudden
     IEnumerator Solved()
     {
+        GameManager.Instance.hasRoundEnded = true;
         yield return new WaitForSeconds(0.5f);
         onPuzzleSolved.Invoke(); // Tell GameManager that the round ended and it should talk to the server.
     }
