@@ -125,7 +125,7 @@ public class NetworkMatchLoop : MonoBehaviour
                     Player playerUpdate = JsonUtility.FromJson<Player>(returnData);
 
                     // Make sure not my own update
-                    if (playerUpdate.uid != uid && GameManager.Instance.players.ContainsKey(playerUpdate.orderid))
+                    if (playerUpdate.uid != uid && GameManager.Instance.players.Count > playerUpdate.orderid)
                     {
                         PlayerBehaviour player = GameManager.Instance.players[playerUpdate.orderid];
 
@@ -166,6 +166,13 @@ public class NetworkMatchLoop : MonoBehaviour
                     GameManager.Instance.currentPlayer = gameState.currentPlayer;
                     GameManager.Instance.TakeTurn();
 
+                    break;
+
+                case "playerDropped":
+                    playerUpdate = JsonUtility.FromJson<Player>(returnData);
+
+                    GameManager.Instance.playerToRemove = playerUpdate.orderid;
+                    GameManager.Instance.removeAPlayer = true;
                     break;
 
                 default:
@@ -248,6 +255,7 @@ public class NetworkMatchLoop : MonoBehaviour
     {
         GameState gameStateMsg = new GameState();
         gameStateMsg.command = "quit";
+        gameStateMsg.uid = uid;
         SendMessage(gameStateMsg);
     }
 

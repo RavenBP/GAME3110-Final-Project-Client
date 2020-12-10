@@ -52,6 +52,7 @@ def ConnectionLoop(sock, playersInMatch):
 
 			# If someone leaves match, still treat it as a dropped player
 			elif data['command'] == 'quit':
+				SendRemovePlayer(sock, userid)
 				print(0)
 
 			# Just pass the message on to everyone else
@@ -167,6 +168,21 @@ def HandleRoundEnd(sock):
 
 		# Reset Roll
 		gameState['beginRoundRollcall'] = 0
+
+def SendRemovePlayer(sock, userid):
+	playerToBeRemoved = players.pop(userid)
+	print("Removed " + userid)
+
+	removePlayerMsg = {}
+	removePlayerMsg['command'] = "playerDropped"
+	removePlayerMsg['orderid'] = playerToBeRemoved['orderid']
+	msg = json.dumps(removePlayerMsg)
+
+	# Tell the others to remove the player
+	for player in players.values():
+
+		addr = player['addr']
+		sock.sendto(bytes(msg, 'utf8'), addr)
 
 ################################################ Server Messaging
 

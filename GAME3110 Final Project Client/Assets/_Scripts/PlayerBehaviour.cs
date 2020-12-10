@@ -45,6 +45,12 @@ public class PlayerBehaviour : MonoBehaviour
         scores.GetComponent<TextMeshProUGUI>().text = (cumulativeScore + roundScore).ToString();
     }
 
+    public void RemovePlayer()
+    {
+        Destroy(scores);
+        Destroy(gameObject);
+    }
+
     // Update is called once per frame
     void Update()
     {

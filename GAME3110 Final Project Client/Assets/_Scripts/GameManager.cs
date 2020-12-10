@@ -23,8 +23,7 @@ public class GameManager : MonoBehaviour
     }
 
     public GameObject playerPrefab;
-    public List<PlayerBehaviour> playerDebug;
-    public Dictionary<int, PlayerBehaviour> players;
+    public List<PlayerBehaviour> players;
     public PlayerBehaviour clientPlayer;
     public int currentPlayer = 0;
     public UI ui;
@@ -43,6 +42,8 @@ public class GameManager : MonoBehaviour
     public bool clientHasTurn = false;
     public char otherPlayerGuess;
     public string otherPlayerSolution;
+    public bool removeAPlayer = false;
+    public int playerToRemove = -1;
 
     public int spinResult;
     public bool hasRoundEnded = false; // Safety at the end of each round to make sure everyone is safe to proceed
@@ -52,13 +53,13 @@ public class GameManager : MonoBehaviour
     {
         ui.AddLoseTurnListener(GiveTurn);
         display.onPuzzleSolved.AddListener(FinishRound);
-        players = new Dictionary<int, PlayerBehaviour>();
+        players = new List<PlayerBehaviour>();
     }
 
     public void AddPlayerToGame(NetworkMatchLoop.Player player, string uid)
     {
         // We already added the player
-        if (players.ContainsKey(player.orderid))
+        if (players.Count > player.orderid)
         {
             return;
         }
@@ -80,8 +81,18 @@ public class GameManager : MonoBehaviour
         }
         newPlayerBehaviour.SetPlayerProfileUI();
 
-        players.Add(player.orderid, newPlayerBehaviour);
-        playerDebug.Add(newPlayer.GetComponent<PlayerBehaviour>());
+        for (int i = 0; i <= player.orderid; i++)
+        {
+            if (i >= players.Count)
+            {
+                players.Add(null);
+            }
+            
+            if (i == player.orderid)
+            {
+                players[i] = newPlayerBehaviour;
+            }
+        }
     }
 
     public bool CheckHasTurn()
@@ -115,6 +126,23 @@ public class GameManager : MonoBehaviour
             roulette.spinning = false;
             clientHasTurn = true;
             //NetworkMatchLoop.Instance.SendGameUpdate(true);
+        }
+    }
+
+    public void RemovePlayer(int id)
+    {
+        if (id >= 0 && id < players.Count)
+        {
+            players[id].RemovePlayer();
+            players.RemoveAt(id);
+
+            // Update client id
+            for (int i = 0; i < players.Count; i++)
+            {
+                players[i].id = i;
+            }
+
+            TakeTurn();
         }
     }
 
@@ -190,6 +218,13 @@ public class GameManager : MonoBehaviour
                     GameManager.Instance.roulette.display.text = spinResult.ToString();
                     break;
             }
+        }
+
+        if (removeAPlayer)
+        {
+            RemovePlayer(playerToRemove);
+            playerToRemove = -1;
+            removeAPlayer = false;
         }
     }
 }

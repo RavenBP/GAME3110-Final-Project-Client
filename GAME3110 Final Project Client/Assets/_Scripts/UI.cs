@@ -217,6 +217,11 @@ public class UI : MonoBehaviour
 
     public void LoadMainMenuScene()
     {
+        if (GameManager.Instance.CheckHasTurn())
+        {
+            StartCoroutine(LoseTurn());
+        }
+        NetworkMatchLoop.Instance.SendQuitMessage();
         SceneManager.LoadScene("MainMenuScene");
     }
 
