@@ -129,12 +129,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void RemovePlayer(int id)
+    public void RemovePlayer(int orderid)
     {
-        if (id >= 0 && id < players.Count)
+        if (orderid >= 0 && orderid < players.Count)
         {
-            players[id].RemovePlayer();
-            players.RemoveAt(id);
+            players[orderid].RemovePlayer();
+            players.RemoveAt(orderid);
 
             // Update client id
             for (int i = 0; i < players.Count; i++)

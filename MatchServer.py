@@ -12,8 +12,6 @@ players_lock = threading.Lock()
 heartbeats = {}
 gameState = {}
 
-rounds = 3;
-
 ################################################ Checking Players' Connections
 
 # For waiting for players to enter room
@@ -60,6 +58,8 @@ def ConnectionLoop(sock, playersInMatch):
 				print("Lose Turn")
 				PassTurn(sock, data)
 
+######################################################### Connection Functions
+
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
 	# Check if the player belongs in this match
@@ -69,6 +69,61 @@ def ConfirmPlayerHasConnected(userid, playersInMatch):
 			return True
 
 	return False
+
+def cleanClients(sock):
+	while True:
+		# use for outside of loop
+		playerToRemove = ''
+		playerToRemoveId = -1
+
+		for player in heartbeats.keys():
+			playerToRemove = ''
+			if (datetime.now() - heartbeats[player]).total_seconds() > 5:
+				playerToRemove = players[player]
+				playerToRemoveId = player # copy for managing clients outside of the loop
+
+				SendRemovePlayer(sock, player)
+
+				# Make player lose turn if they have a turn
+				# Special case, if the guy that is removed is last, need to set currentPlayer to an existing index
+				# Other indices will be handled on the client end
+				if (playerToRemove['orderid'] == gameState['currentPlayer']):
+					if (playerToRemove['orderid'] >= len(players) - 1):
+						gameState['currentPlayer'] = 0
+
+						passTurnMsg = {}
+						passTurnMsg['currentPlayer'] = gameState['currentPlayer']
+
+						PassTurn(sock, passTurnMsg)
+
+				break
+
+		# Need to remove player from heartbeat check but doing it inside the loop causes a dict size change error
+		# so doing it outside of the loop and initializing the variables outside of the loop
+		if (playerToRemove != ''):
+			heartbeats.pop(playerToRemoveId)
+
+		time.sleep(6)
+
+# When rounds all finish
+def MatchOver(sock):
+	
+
+	for player in players.values():
+		endMsg = {}
+		endMsg['command'] = 'matchOver'
+		address = player['addr']
+		msg = json.dumps(endMsg)
+		
+		sock.sendto(bytes(msg, 'utf8'), address)
+
+	# Send results if valid game
+	if (len(players) > 1):
+		resultsMsg = {}
+		for pid in players.keys():
+			#resultsMsg[pid] = players.
+
+		#SetAccountInformation(enteredUsername, addedWins, addedExp)
 
 ############################################### Match Functions
 
@@ -136,6 +191,7 @@ def StartGameSignal(sock, addr):
 	startMsg['command'] = 'startGame'
 	startMsg['wordIndex'] = gameState['currentWord']
 	startMsg['currentPlayer'] = gameState['currentPlayer']
+
 	msg = json.dumps(startMsg)
 		
 	sock.sendto(bytes(msg, 'utf8'), addr)
@@ -143,6 +199,8 @@ def StartGameSignal(sock, addr):
 def PassTurn(sock, passTurnMsg):
 
 	for player in players.values():
+		gameState['currentPlayer'] = passTurnMsg['currentPlayer']
+
 		passTurnMsg['command'] = 'switchTurn'
 		msg = json.dumps(passTurnMsg)
 
@@ -190,9 +248,6 @@ def ServerGameStateRelay(sock, userid):
 	#while True:
 
 	for player in players.values():
-		#if player['uid'] != userid:
-		#gameStateMsg = {'players': []}
-		#gameStateMsg['players'].append(player)
 		gameStateMsg = player.copy()
 		gameStateMsg["command"] = "update"
 		gameStateMsg = json.dumps(gameStateMsg)
@@ -218,6 +273,7 @@ def StartMatchLoop(sock):
 	gameState['remaingWords'] = gameState['remaingWords'] - 1
 
 	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}, '2':{}},))
+	start_new_thread(cleanClients,(sock,))
 	#start_new_thread(ServerGameStateRelay,(sock,))
 
 ################################################ Test Code

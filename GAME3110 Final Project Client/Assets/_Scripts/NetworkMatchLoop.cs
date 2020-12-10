@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System;
 using System.Text;
 using System.Net.Sockets;
@@ -123,40 +124,7 @@ public class NetworkMatchLoop : MonoBehaviour
 
                 case "update":
                     Player playerUpdate = JsonUtility.FromJson<Player>(returnData);
-
-                    // Make sure not my own update
-                    if (playerUpdate.uid != uid && GameManager.Instance.players.Count > playerUpdate.orderid)
-                    {
-                        PlayerBehaviour player = GameManager.Instance.players[playerUpdate.orderid];
-
-                        player.roundScore = playerUpdate.roundScore;
-                        player.cumulativeScore = playerUpdate.cumulativeScore;
-                        
-                        if (playerUpdate.letterGuess.Length > 0 && GameManager.Instance.currentPlayer == player.id)
-                        {
-                            GameManager.Instance.otherPlayerGuess = playerUpdate.letterGuess[0];
-                            GameManager.Instance.otherPlayerGuessing = true;
-                        }
-                        else if (playerUpdate.solveGuess.Length > 0 && GameManager.Instance.currentPlayer == player.id)
-                        {
-                            GameManager.Instance.otherPlayerSolution = playerUpdate.solveGuess;
-                            GameManager.Instance.otherPlayerSolving = true;
-                        }
-
-                        // Only if other player has turn
-                        if (GameManager.Instance.currentPlayer == playerUpdate.orderid)
-                        {
-                            //GameManager.Instance.roulette.spinning = false;
-                            GameManager.Instance.gamePhaseManager.SetPhase((GamePhase)playerUpdate.state);
-
-                            // Only in guess phase
-                            if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
-                            {
-                                GameManager.Instance.roulette.spinning = false;
-                                GameManager.Instance.spinResult = playerUpdate.spinPoints;
-                            }
-                        }
-                    }
+                    ProcessUpdateMessage(playerUpdate);
 
                     break;
 
@@ -175,6 +143,10 @@ public class NetworkMatchLoop : MonoBehaviour
                     GameManager.Instance.removeAPlayer = true;
                     break;
 
+                case "matchOver":
+                    SceneManager.LoadScene("MainMenuScene");
+                    break;
+
                 default:
                     Debug.Log("Error");
                     break;
@@ -187,6 +159,44 @@ public class NetworkMatchLoop : MonoBehaviour
 
         // schedule the next receive operation once reading is done:
         socket.BeginReceive(new AsyncCallback(OnReceived), socket);
+    }
+
+    void ProcessUpdateMessage(Player playerUpdate)
+    {
+        // Make sure not my own update
+        if (playerUpdate.uid != uid && GameManager.Instance.players.Count > playerUpdate.orderid)
+        {
+            PlayerBehaviour player = GameManager.Instance.players[playerUpdate.orderid];
+
+            player.roundScore = playerUpdate.roundScore;
+            player.cumulativeScore = playerUpdate.cumulativeScore;
+
+            if (playerUpdate.letterGuess.Length > 0 && GameManager.Instance.currentPlayer == player.id)
+            {
+                GameManager.Instance.otherPlayerGuess = playerUpdate.letterGuess[0];
+                GameManager.Instance.otherPlayerGuessing = true;
+            }
+            else if (playerUpdate.solveGuess.Length > 0 && GameManager.Instance.currentPlayer == player.id)
+            {
+                GameManager.Instance.otherPlayerSolution = playerUpdate.solveGuess;
+                GameManager.Instance.otherPlayerSolving = true;
+            }
+
+            // Only if other player has turn
+            if (GameManager.Instance.currentPlayer == playerUpdate.orderid)
+            {
+                //GameManager.Instance.roulette.spinning = false;
+                GameManager.Instance.gamePhaseManager.SetPhase((GamePhase)playerUpdate.state);
+
+                // Only in guess phase
+                if (GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
+                {
+                    GameManager.Instance.roulette.spinning = false;
+                    GameManager.Instance.spinResult = playerUpdate.spinPoints;
+                }
+            }
+        }
+
     }
 
     void SendMessage(Message message)
