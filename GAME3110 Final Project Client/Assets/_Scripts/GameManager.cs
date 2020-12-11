@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
     public string otherPlayerSolution;
     public bool removeAPlayer = false;
     public int playerToRemove = -1;
+    public bool gameOver = false;
 
     public int spinResult;
     public bool hasRoundEnded = false; // Safety at the end of each round to make sure everyone is safe to proceed
@@ -225,6 +227,11 @@ public class GameManager : MonoBehaviour
             RemovePlayer(playerToRemove);
             playerToRemove = -1;
             removeAPlayer = false;
+        }
+
+        if (gameOver)
+        {
+            SceneManager.LoadScene("MainMenuScene");
         }
     }
 }

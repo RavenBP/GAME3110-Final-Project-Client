@@ -20,13 +20,17 @@ def ConnectionLoop(sock, playersInMatch):
 	gameState['beginRoundRollcall'] = 0
 
 	while True:
-		data, addr = sock.recvfrom(1024)
-		data = json.loads(data)
+		try:
+			data, addr = sock.recvfrom(1024)
+			data = json.loads(data)
+		except:
+			pass
 
 		# Who sent it
 		userid = data['uid']
 
 		if 'command' in data:
+
 			if data['command'] == 'connect':
 	
 				if ConfirmPlayerHasConnected(userid, playersInMatch):
@@ -37,16 +41,13 @@ def ConnectionLoop(sock, playersInMatch):
 
 			elif data['command'] == 'gameUpdate':
 				# Json format: { 'command': '', 'uid': '', 'orderid': 0, 'state': '', 'letterGuess': '', 'solveGuess': '', 'roundScore': 0, 'cumulativeScore': 0}
+
 				PlayerGameDataUpdate(data, userid, sock)
 
 			# Puzzle solved, start next round
 			elif data['command'] == 'roundEnd':
 				print("Round End")
 				HandleRoundEnd(sock);
-
-			# All rounds finished, go back to lobby
-			elif data['command'] == 'matchEnd':
-				print(0)
 
 			# If someone leaves match, still treat it as a dropped player
 			elif data['command'] == 'quit':
@@ -57,6 +58,11 @@ def ConnectionLoop(sock, playersInMatch):
 			elif data['command'] == 'loseTurn':
 				print("Lose Turn")
 				PassTurn(sock, data)
+
+		if (gameState['roundsLeft'] <= 0 and gameState['state'] == "playing"):
+			# Need the client to send final updates
+			gameState['state'] = "gameOver"
+			start_new_thread(PostGameDelay,(sock,))
 
 ######################################################### Connection Functions
 
@@ -72,6 +78,9 @@ def ConfirmPlayerHasConnected(userid, playersInMatch):
 
 def cleanClients(sock):
 	while True:
+		if (gameState['state'] == "gameOver" or gameState['state'] == "postmatch"):
+			return
+
 		# use for outside of loop
 		playerToRemove = ''
 		playerToRemoveId = -1
@@ -87,14 +96,17 @@ def cleanClients(sock):
 				# Make player lose turn if they have a turn
 				# Special case, if the guy that is removed is last, need to set currentPlayer to an existing index
 				# Other indices will be handled on the client end
-				if (playerToRemove['orderid'] == gameState['currentPlayer']):
+				if (len(players) >= 1 and playerToRemove['orderid'] == gameState['currentPlayer']):
 					if (playerToRemove['orderid'] >= len(players) - 1):
 						gameState['currentPlayer'] = 0
 
 						passTurnMsg = {}
 						passTurnMsg['currentPlayer'] = gameState['currentPlayer']
 
-						PassTurn(sock, passTurnMsg)
+						try:
+							PassTurn(sock, passTurnMsg)
+						except:
+							pass
 
 				break
 
@@ -103,12 +115,18 @@ def cleanClients(sock):
 		if (playerToRemove != ''):
 			heartbeats.pop(playerToRemoveId)
 
-		time.sleep(6)
+		time.sleep(5)
+
+def CheckContinue(sock):
+	# Not enought people to continue
+	if (len(players) <= 1):
+		MatchOver(sock)
+		time.sleep(1)
+		sock.close()
+		gameState['state'] = 'finish'
 
 # When rounds all finish
 def MatchOver(sock):
-	
-
 	for player in players.values():
 		endMsg = {}
 		endMsg['command'] = 'matchOver'
@@ -117,13 +135,55 @@ def MatchOver(sock):
 		
 		sock.sendto(bytes(msg, 'utf8'), address)
 
+def PostGameDelay(sock):
+	print("Waiting for last minute messages")
+	time.sleep(5)
+	print("Finished waiting")
+
+	print("Closing match")
+	ProcessResults()
+	sock.close()
+	gameState['state'] = 'finish'
+
+def ProcessResults():
+	scores = []
+	# Find highest score
+	for player in players.values():
+		scores.append(player['cumulativeScore'])
+
+	maxScore = max(scores)
+	minScore = min(scores)
+
 	# Send results if valid game
 	if (len(players) > 1):
-		resultsMsg = {}
-		for pid in players.keys():
-			#resultsMsg[pid] = players.
+		
+		for player in players.values():
+			addedWins = 0
+			addExp = 0
 
-		#SetAccountInformation(enteredUsername, addedWins, addedExp)
+			totalScore = player['cumulativeScore']
+
+			if (totalScore >= maxScore):
+				addedWins = 1
+				addedExp = 6
+
+			elif (totalScore > minScore):
+				addedExp = 4
+
+			elif (totalScore == minScore):
+				addedExp = 2
+
+			SetAccountInformation(player['uid'], addedWins, addedExp)
+
+	print(scores)
+
+#Replace with actual function
+def SetAccountInformation(enteredUsername, addedWins, addedExp):
+	print("REPLACE ME")
+
+	print("User " + str(enteredUsername) + " Results: ")
+	print(str(addedWins) + " Wins")
+	print(str(addedExp) + " Exp")
 
 ############################################### Match Functions
 
@@ -182,7 +242,11 @@ def PlayerGameDataUpdate(data, userid, sock):
 
 	players_lock.release()
 
-	ServerGameStateRelay(sock, userid)
+	# Get final
+	if (gameState['state'] == 'gameOver'):
+		MatchOver(sock)
+	else:
+		ServerGameStateRelay(sock, userid)
 
 #Pregame setup, basically who begins game, what is the word
 #Should be called for each new player and after each round
@@ -217,6 +281,7 @@ def HandleRoundEnd(sock):
 		gameState['remaingWords'] = gameState['remaingWords'] - 1
 
 		gameState['roundsLeft'] -= 1
+		print("Rounds Left: ")
 		print(gameState['roundsLeft'])
 
 		for player in players.values():
@@ -242,6 +307,8 @@ def SendRemovePlayer(sock, userid):
 		addr = player['addr']
 		sock.sendto(bytes(msg, 'utf8'), addr)
 
+	CheckContinue(sock)
+
 ################################################ Server Messaging
 
 def ServerGameStateRelay(sock, userid):
@@ -254,38 +321,41 @@ def ServerGameStateRelay(sock, userid):
 
 		for playerAddress in players.values():
 			address = playerAddress['addr']
-			sock.sendto(bytes(gameStateMsg, 'utf8'), address)
+			try:
+				sock.sendto(bytes(gameStateMsg, 'utf8'), address)
+			except:
+				pass
 
 		#print("Sent ")
 		#print(gameStateMsg)
 
 ################################################ Start Match
 
-def StartMatchLoop(sock):
+def StartMatchLoop(sock, playersJoining):
 	print("Match started")
-
 	gameState['currentPlayer'] = 0
 	gameState['remaingWords'] = 12
-	gameState['roundsLeft'] = 3
+	gameState['roundsLeft'] = 1
+	gameState['state'] = "playing"
 
 	# Generate random word
 	gameState['currentWord'] = random.randint(0, gameState['remaingWords']-1)
 	gameState['remaingWords'] = gameState['remaingWords'] - 1
 
-	start_new_thread(ConnectionLoop,(sock,{'0':{}, '1':{}, '2':{}},))
+	start_new_thread(ConnectionLoop,(sock,playersJoining,))
 	start_new_thread(cleanClients,(sock,))
-	#start_new_thread(ServerGameStateRelay,(sock,))
+
+	while gameState['state'] != 'finish':
+		time.sleep(1/30)
 
 ################################################ Test Code
 
 def main():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind(('', 12345))
+	playersJoining = {'0':{}, '1':{}, '2':{}}
 
-	StartMatchLoop(sock)
-
-	while True:
-		time.sleep(1/30)
+	StartMatchLoop(sock, playersJoining)
 
 if __name__ == '__main__':
    main()

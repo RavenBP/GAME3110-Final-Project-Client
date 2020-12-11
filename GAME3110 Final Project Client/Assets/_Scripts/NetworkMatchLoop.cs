@@ -58,6 +58,7 @@ public class NetworkMatchLoop : MonoBehaviour
 
     public UI ui;
     public GamePhase currentPhase = GamePhase.SELECT;
+    public GameObject game;
 
     private Queue<Player> playersToAdd; // Temporary variable to add to game
 
@@ -144,7 +145,9 @@ public class NetworkMatchLoop : MonoBehaviour
                     break;
 
                 case "matchOver":
-                    SceneManager.LoadScene("MainMenuScene");
+                    SendGameUpdate(true); // Last update
+                    GameManager.Instance.gameOver = true;
+                    socket.Close();
                     break;
 
                 default:
