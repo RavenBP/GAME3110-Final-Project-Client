@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour
     public bool removeAPlayer = false;
     public int playerToRemove = -1;
     public bool gameOver = false;
+    public bool connected = false;
 
     public int spinResult;
     public bool hasRoundEnded = false; // Safety at the end of each round to make sure everyone is safe to proceed
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour
         PlayerBehaviour newPlayerBehaviour = newPlayer.GetComponent<PlayerBehaviour>();
 
         newPlayerBehaviour.id = player.orderid;
+        newPlayerBehaviour.username = player.uid;
 
         // If the new player is this player
         if (player.uid == uid)
@@ -163,7 +165,7 @@ public class GameManager : MonoBehaviour
     // Handle remote gameplay
     private void Update()
     {
-        if (gameStart == false && wordIndex != prevWordIndex && display.wordBank != null)
+        if (gameStart == false && wordIndex != prevWordIndex && display.wordBank != null && connected)
         {
             prevWordIndex = wordIndex;
             gameStart = true;

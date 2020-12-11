@@ -44,10 +44,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
-  score: 0
+  cumulativeScore: 0
+  roundScore: 0
   hasTurn: 1
-  display: {fileID: 0}
-  scoreLabelPrefab: {fileID: 6150503222561206285, guid: c7c23402ce4950a4ebb0b7e5938b764c, type: 3}
-  tmpInputField: {fileID: 0}
-  submitButton: {fileID: 0}
-  scoreLabel: {fileID: 0}
+  scoreLabelPrefab: {fileID: 3973764416501533369, guid: 5794008e0532ca942a289c52b3f157f5, type: 3}
+  ui: {fileID: 0}
+  scores: {fileID: 0}

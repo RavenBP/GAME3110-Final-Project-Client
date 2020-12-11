@@ -58,14 +58,14 @@ public class NetworkMatchLoop : MonoBehaviour
 
     public UI ui;
     public GamePhase currentPhase = GamePhase.SELECT;
-    public GameObject game;
+    public int matchPort;
 
     private Queue<Player> playersToAdd; // Temporary variable to add to game
 
     // TODO: REMOVE AFTER INTEGRATION
     private void Start()
     {
-        StartMatchConnection(12345);
+        StartMatchConnection(matchPort);
     }
 
     // Start connection to match socket
@@ -110,6 +110,7 @@ public class NetworkMatchLoop : MonoBehaviour
             switch (latestMessage.command)
             {
                 case "startGame":
+                    GameManager.Instance.connected = true;
                     GameState gameState = JsonUtility.FromJson<GameState>(returnData);
                     GameManager.Instance.wordIndex = gameState.wordIndex;
                     GameManager.Instance.hasRoundEnded = false;

@@ -12,6 +12,7 @@ using UnityEngine.Events;
 public class PlayerBehaviour : MonoBehaviour
 {
     public int id;
+    public string username;
     public int cumulativeScore;
     public int roundScore;
     public bool hasTurn;
@@ -22,6 +23,8 @@ public class PlayerBehaviour : MonoBehaviour
 
     [SerializeField]
     private GameObject scores;
+    private GameObject playerInfo;
+    public TMP_Text playerUsernameLabel;
 
     private void Awake()
     {
@@ -36,8 +39,14 @@ public class PlayerBehaviour : MonoBehaviour
         scoreLabel = ui.scoreLabel;
 
         // Instantiate the score label so that new players will have their score go underneath the previous
-        scores = Instantiate(scoreLabelPrefab, ui.scoreLabel.transform);
-        scores.GetComponent<RectTransform>().position += new Vector3(0, (id - 1));
+        playerInfo = Instantiate(scoreLabelPrefab, ui.scoreLabel.transform);
+
+        playerUsernameLabel = playerInfo.transform.Find("Player_Name").gameObject.GetComponent<TMP_Text>();
+        playerUsernameLabel.text = username;
+
+        scores = playerInfo.transform.Find("Player_Score").gameObject;
+
+        playerInfo.GetComponent<RectTransform>().localPosition = new Vector3(40, (playerInfo.GetComponent<RectTransform>().localPosition.y - 120 * id));
     }
 
     public void DisplayScore()

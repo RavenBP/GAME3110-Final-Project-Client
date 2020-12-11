@@ -353,7 +353,7 @@ def StartMatchLoop(sock, playersJoining):
 def main():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind(('', 12345))
-	playersJoining = {'0':{}, '1':{}, '2':{}}
+	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
 
 	StartMatchLoop(sock, playersJoining)
 
