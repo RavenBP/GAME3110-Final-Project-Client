@@ -8,13 +8,15 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.Networking;
 
 public class UI : MonoBehaviour
 {
     public GameObject errorText; // NOTE: Would be better to specify that this is a TMP Text object...
 
     public static List<string> usernames = new List<string>() {"test", "test2"}; // TODO: List of account objects will likely need to be obtained here
-    public TMP_InputField tmpInputField;
+    public TMP_InputField tmpInputField1;
+    public TMP_InputField tmpInputField2;
     public TMP_InputField tmpSolveField;
 
     public Display display;
@@ -38,15 +40,41 @@ public class UI : MonoBehaviour
 
     public void Login()
     {
-        if (usernames.Contains(tmpInputField.text)) // Entered username exists within known usernames
+        Debug.Log("Logging in...");
+        StartCoroutine(AccountLogin(tmpInputField1.text, tmpInputField2.text));
+    }
+
+    IEnumerator AccountLogin(string username, string password)
+    {
+        UnityWebRequest webRequest = UnityWebRequest.Get("https://ren12vw886.execute-api.us-east-1.amazonaws.com/default/AccountLogin?username=" + username + "&password=" + password);
+
+        yield return webRequest.SendWebRequest();
+
+        // Because of JSON serialization, " is being added to the beginning/end of the string we are retrieving...
+        string testString = webRequest.downloadHandler.text;
+        testString = testString.Trim('"'); 
+
+        if (webRequest.isNetworkError == false)
         {
-            PlayerInfo.username = tmpInputField.text;
-            SceneManager.LoadScene("MainMenuScene");
+            if (testString == "LOGGED IN")
+            {
+                PlayerInfo.username = username; // NOTE: It might be better to set the username to the username found in the database...
+                SceneManager.LoadScene("MainMenuScene");
+                Debug.Log("The player logged in");
+            }
+            else if (testString == "INCORRECT PASSWORD")
+            {
+                Debug.Log("The player entered an incorrect password");
+            }
+            else if (testString == "ACCOUNT DOES NOT EXIST")
+            {
+                Debug.Log("That account does not exist");
+                errorText.SetActive(true);
+            }
         }
         else
         {
-            errorText.SetActive(true);
-            Debug.Log("Username does not exist");
+            Debug.Log("Network Error");
         }
     }
 
@@ -57,14 +85,14 @@ public class UI : MonoBehaviour
 
     public void CreateAccount()
     {
-        if (usernames.Contains(tmpInputField.text)) // Entered username exists within known usernames
+        if (usernames.Contains(tmpInputField1.text)) // Entered username exists within known usernames
         {
             errorText.SetActive(true);
         }
-        else if (!usernames.Contains(tmpInputField.text)) // Create account here
+        else if (!usernames.Contains(tmpInputField1.text)) // Create account here
         {
-            usernames.Add(tmpInputField.text);
-            PlayerInfo.username = tmpInputField.text;
+            usernames.Add(tmpInputField1.text);
+            PlayerInfo.username = tmpInputField1.text;
             SceneManager.LoadScene("MainMenuScene");
 
             //for (int i = 0; i < usernames.Count; i++)
@@ -106,14 +134,14 @@ public class UI : MonoBehaviour
             else
             {
                 // Sets the input field to selected
-                EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-                tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+                EventSystem.current.SetSelectedGameObject(tmpInputField1.gameObject, null);
+                tmpInputField1.OnPointerClick(new PointerEventData(EventSystem.current));
             }
             // Show player's current score
             player.DisplayScore();
 
             tmpSolveField.text = "";
-            tmpInputField.Select();
+            tmpInputField1.Select();
 
             solve.SetActive(false);
             guess.SetActive(true);
@@ -124,11 +152,11 @@ public class UI : MonoBehaviour
         }
         else if (guess.activeInHierarchy && GameManager.Instance.gamePhaseManager.CheckPhase(GamePhase.GUESS))
         {
-            if (tmpInputField.text != "")
+            if (tmpInputField1.text != "")
             {
                 int scoreVal = GameManager.Instance.roulette.GetSpinResult();
 
-                guessChar = (tmpInputField.text.ToCharArray())[0];
+                guessChar = (tmpInputField1.text.ToCharArray())[0];
                 NetworkMatchLoop.Instance.SendGameUpdate(); // Send after each guess
 
                 // Clears the guess
@@ -139,15 +167,15 @@ public class UI : MonoBehaviour
                 else
                 {
                     // Sets the input field to selected
-                    EventSystem.current.SetSelectedGameObject(tmpInputField.gameObject, null);
-                    tmpInputField.OnPointerClick(new PointerEventData(EventSystem.current));
+                    EventSystem.current.SetSelectedGameObject(tmpInputField1.gameObject, null);
+                    tmpInputField1.OnPointerClick(new PointerEventData(EventSystem.current));
                 }
 
                 // Show player's current score
                 player.DisplayScore();
 
-                tmpInputField.text = "";
-                tmpInputField.Select();
+                tmpInputField1.text = "";
+                tmpInputField1.Select();
 
                 GameManager.Instance.gamePhaseManager.SetPhase(GamePhase.SELECT);
 
@@ -167,7 +195,7 @@ public class UI : MonoBehaviour
 
     public void DisableInput()
     {
-        tmpInputField.interactable = false;
+        tmpInputField1.interactable = false;
         tmpSolveField.interactable = false;
         submitButton.interactable = false;
 
@@ -179,7 +207,7 @@ public class UI : MonoBehaviour
 
     public void EnableInput()
     {
-        tmpInputField.interactable = true;
+        tmpInputField1.interactable = true;
         tmpSolveField.interactable = true;
         submitButton.interactable = true;
 
