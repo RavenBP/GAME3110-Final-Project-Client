@@ -52,7 +52,9 @@ public class NetworkMatchLoop : MonoBehaviour
     }
 
     public UdpClient udp;
-    public string uid; // TODO: REMOVE AFTER INTEGRATION
+    UdpClient socket;
+
+    public string uid;
 
     public Message latestMessage;
 
@@ -63,20 +65,20 @@ public class NetworkMatchLoop : MonoBehaviour
     private Queue<Player> playersToAdd; // Temporary variable to add to game
 
     // TODO: REMOVE AFTER INTEGRATION
-    private void Start()
-    {
-        StartMatchConnection(matchPort);
-    }
+    //private void Start()
+    //{
+    //    StartMatchConnection("localhost", matchPort);
+    //}
 
     // Start connection to match socket
-    public void StartMatchConnection(int matchPort)
+    public void StartMatchConnection(string ip, int matchPort)
     {
         playersToAdd = new Queue<Player>();
 
         udp = new UdpClient();
 
         //udp.Connect("3.130.200.122", matchPort);
-        udp.Connect("localhost", matchPort);
+        udp.Connect(ip, matchPort);
 
         Message connectionMsg = new Message();
         connectionMsg.command = "connect";
@@ -92,7 +94,7 @@ public class NetworkMatchLoop : MonoBehaviour
     void OnReceived(IAsyncResult result)
     {
         // this is what had been passed into BeginReceive as the second parameter:
-        UdpClient socket = result.AsyncState as UdpClient;
+        socket = result.AsyncState as UdpClient;
 
         // points towards whoever had sent the message:
         IPEndPoint source = new IPEndPoint(0, 0);
@@ -116,6 +118,8 @@ public class NetworkMatchLoop : MonoBehaviour
                     GameManager.Instance.hasRoundEnded = false;
                     ui.guessChar = '\0';
                     ui.guessSolve = "";
+                    GameManager.Instance.currentPlayer = gameState.currentPlayer;
+
                     SendGameUpdate(); // Start game confirmation plus message refresh
 
                     break;
@@ -146,9 +150,8 @@ public class NetworkMatchLoop : MonoBehaviour
                     break;
 
                 case "matchOver":
-                    SendGameUpdate(true); // Last update
                     GameManager.Instance.gameOver = true;
-                    socket.Close();
+                    
                     break;
 
                 default:
@@ -163,6 +166,11 @@ public class NetworkMatchLoop : MonoBehaviour
 
         // schedule the next receive operation once reading is done:
         socket.BeginReceive(new AsyncCallback(OnReceived), socket);
+    }
+
+    public void CloseConnection()
+    {
+        socket.Close();
     }
 
     void ProcessUpdateMessage(Player playerUpdate)
@@ -203,10 +211,15 @@ public class NetworkMatchLoop : MonoBehaviour
 
     }
 
-    void SendMessage(Message message)
+    bool SendMessage(Message message)
     {
-        Byte[] sendBytes = Encoding.ASCII.GetBytes(JsonUtility.ToJson(message));
-        udp.Send(sendBytes, sendBytes.Length);
+        try
+        {
+            Byte[] sendBytes = Encoding.ASCII.GetBytes(JsonUtility.ToJson(message));
+            udp.Send(sendBytes, sendBytes.Length);
+        }
+        catch { }
+        return true;
     }
 
     void HeartBeat()
@@ -218,11 +231,11 @@ public class NetworkMatchLoop : MonoBehaviour
         SendMessage(heartMsg);
     }
 
-    public void SendGameUpdate(bool emergency = false)
+    public bool SendGameUpdate(bool emergency = false)
     {
-        if (GameManager.Instance.clientPlayer == null || !GameManager.Instance.CheckHasTurn() && !emergency)
+        if ((GameManager.Instance.clientPlayer == null) || (!GameManager.Instance.CheckHasTurn() && !emergency))
         {
-            return;
+            return true;
         }
 
         Player gameMsg = new Player();
@@ -234,6 +247,8 @@ public class NetworkMatchLoop : MonoBehaviour
         gameMsg.cumulativeScore = GameManager.Instance.clientPlayer.cumulativeScore; // Players score according to the UI label
         gameMsg.orderid = GameManager.Instance.clientPlayer.id; // ID inside the game, not profile id
 
+        print(GameManager.Instance.clientPlayer.cumulativeScore);
+
         gameMsg.letterGuess = ui.guessChar.ToString(); // Player's letter guess
         gameMsg.solveGuess = ui.guessSolve; // Player's solve guess
 
@@ -243,7 +258,7 @@ public class NetworkMatchLoop : MonoBehaviour
 
         gameMsg.state = (int)GameManager.Instance.gamePhaseManager.phase;
 
-        SendMessage(gameMsg);
+        return SendMessage(gameMsg);
     }
 
     public void SendLoseTurnMessage(int currentPlayer)

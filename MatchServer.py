@@ -19,7 +19,7 @@ gameState = {}
 def ConnectionLoop(sock, playersInMatch):
 	gameState['beginRoundRollcall'] = 0
 
-	while True:
+	while gameState['state'] != 'finish':
 		try:
 			data, addr = sock.recvfrom(1024)
 			data = json.loads(data)
@@ -68,16 +68,14 @@ def ConnectionLoop(sock, playersInMatch):
 
 def ConfirmPlayerHasConnected(userid, playersInMatch):
 
-	# Check if the player belongs in this match
-	if userid in playersInMatch.keys():
-		# Check if player is registered in the match
-		if userid not in players:
-			return True
+	# Check if player is registered in the match
+	if userid not in players:
+		return True
 
 	return False
 
 def cleanClients(sock):
-	while True:
+	while gameState['state'] != 'finish':
 		if (gameState['state'] == "gameOver" or gameState['state'] == "postmatch"):
 			return
 
@@ -119,7 +117,7 @@ def cleanClients(sock):
 
 def CheckContinue(sock):
 	# Not enought people to continue
-	if (len(players) <= 1):
+	if (len(players) <= 1 and gameState['state'] != 'finish'):
 		MatchOver(sock)
 		time.sleep(1)
 		sock.close()
@@ -230,7 +228,6 @@ def CreatePlayerGameData(addr, userid, sock):
 	print(players)
 
 def PlayerGameDataUpdate(data, userid, sock):
-	players_lock.acquire()
 
 	players[userid]['orderid'] = data['orderid']
 	players[userid]['state'] = data['state']
@@ -240,13 +237,7 @@ def PlayerGameDataUpdate(data, userid, sock):
 	players[userid]['roundScore'] = data['roundScore']
 	players[userid]['cumulativeScore'] = data['cumulativeScore']
 
-	players_lock.release()
-
-	# Get final
-	if (gameState['state'] == 'gameOver'):
-		MatchOver(sock)
-	else:
-		ServerGameStateRelay(sock, userid)
+	ServerGameStateRelay(sock, userid)
 
 #Pregame setup, basically who begins game, what is the word
 #Should be called for each new player and after each round
@@ -284,6 +275,8 @@ def HandleRoundEnd(sock):
 		print("Rounds Left: ")
 		print(gameState['roundsLeft'])
 
+		gameState['currentPlayer'] = random.randint(0, len(players) - 1)
+
 		for player in players.values():
 			StartGameSignal(sock, player['addr'])
 
@@ -291,6 +284,9 @@ def HandleRoundEnd(sock):
 
 		# Reset Roll
 		gameState['beginRoundRollcall'] = 0
+
+	if (gameState['roundsLeft'] <= 0):
+		MatchOver(sock)
 
 def SendRemovePlayer(sock, userid):
 	playerToBeRemoved = players.pop(userid)
@@ -331,11 +327,11 @@ def ServerGameStateRelay(sock, userid):
 
 ################################################ Start Match
 
-def StartMatchLoop(sock, playersJoining):
+def StartMatchLoop(sock, playersJoining, rounds):
 	print("Match started")
 	gameState['currentPlayer'] = 0
 	gameState['remaingWords'] = 12
-	gameState['roundsLeft'] = 1
+	gameState['roundsLeft'] = rounds
 	gameState['state'] = "playing"
 
 	# Generate random word
@@ -350,12 +346,13 @@ def StartMatchLoop(sock, playersJoining):
 
 ################################################ Test Code
 
-def main():
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	sock.bind(('', 12345))
-	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
+# def main():
+# 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# 	sock.bind(('', 12345))
+# 	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
+# 	rounds = 3
 
-	StartMatchLoop(sock, playersJoining)
+# 	StartMatchLoop(sock, playersJoining, rounds)
 
-if __name__ == '__main__':
-   main()
+# if __name__ == '__main__':
+#    main()

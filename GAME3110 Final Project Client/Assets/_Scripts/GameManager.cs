@@ -131,6 +131,10 @@ public class GameManager : MonoBehaviour
             clientHasTurn = true;
             //NetworkMatchLoop.Instance.SendGameUpdate(true);
         }
+        else
+        {
+            ui.DisableInput();
+        }
     }
 
     public void RemovePlayer(int orderid)
@@ -162,6 +166,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    IEnumerator CloseMatch()
+    {
+        display.gameObject.SetActive(false);  
+
+        NetworkMatchLoop.Instance.SendGameUpdate(true);
+        yield return new WaitForSeconds(1);
+        SceneManager.LoadScene("MainMenuScene");
+        NetworkMatchLoop.Instance.CloseConnection();
+    }
+
     // Handle remote gameplay
     private void Update()
     {
@@ -175,6 +189,8 @@ public class GameManager : MonoBehaviour
             // No one should be guessing
             otherPlayerGuessing = false;
             otherPlayerGuessing = false;
+
+            TakeTurn();
         }
 
         // Remote guess
@@ -233,7 +249,7 @@ public class GameManager : MonoBehaviour
 
         if (gameOver)
         {
-            SceneManager.LoadScene("MainMenuScene");
+            StartCoroutine(CloseMatch());
         }
     }
 }
