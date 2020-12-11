@@ -30,6 +30,8 @@ public class UI : MonoBehaviour
 
     public List<Button> interactableButtons;
 
+    bool canContinue = false;
+
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     private void Start()
@@ -42,6 +44,11 @@ public class UI : MonoBehaviour
     {
         Debug.Log("Logging in...");
         StartCoroutine(AccountLogin(tmpInputField1.text, tmpInputField2.text));
+
+        if (canContinue == true)
+        {
+            Debug.Log("Do the second request");
+        }
     }
 
     IEnumerator AccountLogin(string username, string password)
@@ -59,7 +66,9 @@ public class UI : MonoBehaviour
             if (testString == "LOGGED IN")
             {
                 PlayerInfo.username = username; // NOTE: It might be better to set the username to the username found in the database...
-                SceneManager.LoadScene("MainMenuScene");
+
+                StartCoroutine(GetAccountInfo(username));
+
                 Debug.Log("The player logged in");
             }
             else if (testString == "INCORRECT PASSWORD")
@@ -78,6 +87,26 @@ public class UI : MonoBehaviour
         }
     }
 
+    IEnumerator GetAccountInfo(string username)
+    {
+        UnityWebRequest webRequest = UnityWebRequest.Get("https://zkh251iic9.execute-api.us-east-1.amazonaws.com/default/GetAccount?username=" + username);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError == false)
+        {
+            //NOTE: Player's information needs to be set here.
+        }
+        else
+        {
+            Debug.Log("Network Error");
+        }
+
+        SceneManager.LoadScene("MainMenuScene");
+
+        Debug.Log(webRequest.downloadHandler.text);
+    }
+
     public void LoadCreateAccountScene()
     {
         SceneManager.LoadScene("CreateAccountScene");
@@ -85,20 +114,44 @@ public class UI : MonoBehaviour
 
     public void CreateAccount()
     {
-        if (usernames.Contains(tmpInputField1.text)) // Entered username exists within known usernames
-        {
-            errorText.SetActive(true);
-        }
-        else if (!usernames.Contains(tmpInputField1.text)) // Create account here
-        {
-            usernames.Add(tmpInputField1.text);
-            PlayerInfo.username = tmpInputField1.text;
-            SceneManager.LoadScene("MainMenuScene");
+        Debug.Log("Checking username availability...");
 
-            //for (int i = 0; i < usernames.Count; i++)
-            //{
-            //    Debug.Log("The " + i + " element in the list contains: " + usernames[i]);
-            //}
+        StartCoroutine(CreateAccountLambda(tmpInputField1.text, tmpInputField2.text));
+    }
+
+    IEnumerator CreateAccountLambda(string username, string password)
+    {
+        // Check to see if username is available
+        UnityWebRequest usernameCheckWebrequest = UnityWebRequest.Get("https://qkeqah28fb.execute-api.us-east-1.amazonaws.com/default/CheckUsername?attemptedUsername=" + username);
+
+        yield return usernameCheckWebrequest.SendWebRequest();
+
+        string testString = usernameCheckWebrequest.downloadHandler.text;
+        testString = testString.Trim('"');
+
+        if (usernameCheckWebrequest.isNetworkError == false)
+        {
+            if (testString == "USERNAME ALREADY IN USE")
+            {
+                errorText.SetActive(true);
+                Debug.Log("That username is taken");
+            }
+            else if (testString == "USERNAME AVAILABLE")
+            {
+                Debug.Log("Creating Account...");
+                UnityWebRequest accountCreationWebRequest = UnityWebRequest.Get("https://37n3yjs575.execute-api.us-east-1.amazonaws.com/default/CreateAccount?username=" + username + "&password=" + password);
+
+                yield return accountCreationWebRequest.SendWebRequest();
+
+                PlayerInfo.username = username;
+                Debug.Log("Account created.");
+
+                SceneManager.LoadScene("MainMenuScene");
+            }
+        }
+        else
+        {
+            Debug.Log("Network Error");
         }
     }
 
