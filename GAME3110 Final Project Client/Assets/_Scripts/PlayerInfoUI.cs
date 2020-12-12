@@ -32,10 +32,4 @@ public class PlayerInfoUI : MonoBehaviour
             winsText.text = PlayerInfo.numWins.ToString();
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

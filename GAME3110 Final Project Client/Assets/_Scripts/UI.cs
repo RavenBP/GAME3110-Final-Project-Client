@@ -32,6 +32,18 @@ public class UI : MonoBehaviour
 
     bool canContinue = false;
 
+    
+    [System.Serializable]
+    public class TestClass
+    {
+        public string numWins;
+        public string Password;
+        public string exp;
+        public string Username;
+    }
+
+    TestClass playerInfo;
+
     ///////////////////////////////////// LoginScene /////////////////////////////////////
 
     private void Start()
@@ -95,7 +107,12 @@ public class UI : MonoBehaviour
 
         if (webRequest.isNetworkError == false)
         {
-            //NOTE: Player's information needs to be set here.
+            // Using the test class from above... would be better to use the PlayerInfo class.
+            playerInfo = JsonUtility.FromJson<TestClass>(webRequest.downloadHandler.text);
+
+            // Set player information into the class we are using
+            PlayerInfo.numWins = int.Parse(playerInfo.numWins);
+            PlayerInfo.exp = int.Parse(playerInfo.exp);
         }
         else
         {
@@ -303,6 +320,11 @@ public class UI : MonoBehaviour
             StartCoroutine(LoseTurn());
         }
         NetworkMatchLoop.Instance.SendQuitMessage();
+        SceneManager.LoadScene("MainMenuScene");
+    }
+
+    public void LoadMainMenuSceneButton()
+    {
         SceneManager.LoadScene("MainMenuScene");
     }
 

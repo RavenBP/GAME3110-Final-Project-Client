@@ -603,7 +603,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   errorText: {fileID: 0}
-  tmpInputField: {fileID: 278554417}
+  tmpInputField1: {fileID: 278554417}
+  tmpInputField2: {fileID: 0}
   tmpSolveField: {fileID: 1667418850}
   display: {fileID: 590419743}
   submitButton: {fileID: 1303226490}
