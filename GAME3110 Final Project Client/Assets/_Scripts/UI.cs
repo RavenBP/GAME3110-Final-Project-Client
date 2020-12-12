@@ -111,6 +111,7 @@ public class UI : MonoBehaviour
             playerInfo = JsonUtility.FromJson<TestClass>(webRequest.downloadHandler.text);
 
             // Set player information into the class we are using
+            PlayerInfo.username = playerInfo.Username;
             PlayerInfo.numWins = int.Parse(playerInfo.numWins);
             PlayerInfo.exp = int.Parse(playerInfo.exp);
         }
@@ -118,6 +119,7 @@ public class UI : MonoBehaviour
         {
             Debug.Log("Network Error");
         }
+
 
         SceneManager.LoadScene("MainMenuScene");
 
@@ -326,6 +328,52 @@ public class UI : MonoBehaviour
     public void LoadMainMenuSceneButton()
     {
         SceneManager.LoadScene("MainMenuScene");
+    }
+
+
+    // NOTE: Remember that currently BOTH variables need to be changed. (DynamoDB/Client Variables)
+    public void IncrementWinsButton()
+    {
+        StartCoroutine(SetAccountLambda(PlayerInfo.username, PlayerInfo.numWins + 1, PlayerInfo.exp));
+        PlayerInfo.numWins += 1;
+    }
+
+    public void DecrementWinsButton()
+    {
+        StartCoroutine(SetAccountLambda(PlayerInfo.username, PlayerInfo.numWins - 1, PlayerInfo.exp));
+        PlayerInfo.numWins -= 1;
+    }
+
+    public void IncrementExpWins()
+    {
+        StartCoroutine(SetAccountLambda(PlayerInfo.username, PlayerInfo.numWins, PlayerInfo.exp + 1));
+        PlayerInfo.exp += 1;
+    }
+
+    public void DecrementExpWins()
+    {
+        StartCoroutine(SetAccountLambda(PlayerInfo.username, PlayerInfo.numWins, PlayerInfo.exp - 1));
+        PlayerInfo.exp -= 1;
+    }
+
+    IEnumerator SetAccountLambda(string username, int wins, int xp)
+    {
+        Debug.Log("Updating Account Info...");
+
+        UnityWebRequest webRequest = UnityWebRequest.Get("https://41afs1awpk.execute-api.us-east-1.amazonaws.com/default/SetAccount?username=" + username + "&nwins=" + wins + "&xp=" + xp);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError == false)
+        {
+            Debug.Log("Account Info Updated");
+
+            // Might be best to call GetAccount Lambda Function here and set the PlayerInfo variables to what is stored in the DynamoDB table.
+        }
+        else
+        {
+            Debug.Log("Network error");
+        }
     }
 
     ///////////////////////////////////// DEBUG /////////////////////////////////////
