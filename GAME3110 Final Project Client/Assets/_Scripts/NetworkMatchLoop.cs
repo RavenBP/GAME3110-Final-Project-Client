@@ -65,10 +65,10 @@ public class NetworkMatchLoop : MonoBehaviour
     private Queue<Player> playersToAdd; // Temporary variable to add to game
 
     // TODO: REMOVE AFTER INTEGRATION
-    //private void Start()
-    //{
-    //    StartMatchConnection("localhost", matchPort);
-    //}
+    private void Start()
+    {
+        StartMatchConnection("localhost", matchPort);
+    }
 
     // Start connection to match socket
     public void StartMatchConnection(string ip, int matchPort)

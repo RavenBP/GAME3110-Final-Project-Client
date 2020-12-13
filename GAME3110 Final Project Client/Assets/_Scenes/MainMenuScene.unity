@@ -298,6 +298,9 @@ MonoBehaviour:
   scoreLabel: {fileID: 0}
   solve: {fileID: 0}
   guess: {fileID: 0}
+  guessChar: 0
+  guessSolve: 
+  interactableButtons: []
 --- !u!114 &144945810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1435,7 +1438,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 144945809}
         m_TargetAssemblyTypeName: UI, Assembly-CSharp
-        m_MethodName: LoadGameScene
+        m_MethodName: LoadLobbyScene
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

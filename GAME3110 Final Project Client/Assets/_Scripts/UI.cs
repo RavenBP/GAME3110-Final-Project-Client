@@ -33,7 +33,12 @@ public class UI : MonoBehaviour
     private void Start()
     {
         // Players are instantiated dynamically, so by default it is null in the inspector
-        submitButton.GetComponent<Button>().onClick.AddListener(SubmitLetter);
+
+        if(SceneManager.GetActiveScene().name == "GameScene")
+        {
+            submitButton.GetComponent<Button>().onClick.AddListener(SubmitLetter);
+        }
+        
     }
 
     public void Login()
@@ -213,6 +218,11 @@ public class UI : MonoBehaviour
     public void LoadGameScene()
     {
         SceneManager.LoadScene("GameScene");
+    }
+
+    public void LoadLobbyScene()
+    {
+        SceneManager.LoadScene("LobbyScene");
     }
 
     public void LoadMainMenuScene()

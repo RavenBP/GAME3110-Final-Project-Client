@@ -346,13 +346,13 @@ def StartMatchLoop(sock, playersJoining, rounds):
 
 ################################################ Test Code
 
-# def main():
-# 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# 	sock.bind(('', 12345))
-# 	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
-# 	rounds = 3
+def main():
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock.bind(('', 12345))
+	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
+	rounds = 3
 
-# 	StartMatchLoop(sock, playersJoining, rounds)
+	StartMatchLoop(sock, playersJoining, rounds)
 
-# if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+   main()
