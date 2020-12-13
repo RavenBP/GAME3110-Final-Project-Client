@@ -57,6 +57,7 @@ public class PlayerBehaviour : MonoBehaviour
     public void RemovePlayer()
     {
         Destroy(scores);
+        Destroy(playerInfo);
         Destroy(gameObject);
     }
 

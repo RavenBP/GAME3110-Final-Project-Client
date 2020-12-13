@@ -68,7 +68,6 @@ public class NetworkMatchLoop : MonoBehaviour
     private void Start()
     {
         ui.DisableInput();
-        uid = PlayerInfo.username;
         //StartMatchConnection("localhost", matchPort);
     }
 
@@ -80,7 +79,8 @@ public class NetworkMatchLoop : MonoBehaviour
         // Wait until client is initialized
         while (uid == "")
         {
-            uid = "Apple";
+            //uid = "Apple";
+            uid = PlayerInfo.username;
             yield return null;
         }
 
@@ -89,7 +89,7 @@ public class NetworkMatchLoop : MonoBehaviour
         //udp.Connect("3.130.200.122", matchPort);
 
         udp.Connect(ip, matchPort);
-        
+
         Message connectionMsg = new Message();
         connectionMsg.command = "connect";
         connectionMsg.uid = uid;
@@ -180,7 +180,7 @@ public class NetworkMatchLoop : MonoBehaviour
 
     public void CloseConnection()
     {
-        socket.Close();
+
     }
 
     void ProcessUpdateMessage(Player playerUpdate)
@@ -226,11 +226,7 @@ public class NetworkMatchLoop : MonoBehaviour
         try
         {
             Byte[] sendBytes = Encoding.ASCII.GetBytes(JsonUtility.ToJson(message));
-
-            if (udp.Send(sendBytes, sendBytes.Length) <= 0)
-            {
-                SceneManager.LoadScene("MainMenuScene");
-            }
+            udp.Send(sendBytes, sendBytes.Length);
         }
         catch { }
         return true;

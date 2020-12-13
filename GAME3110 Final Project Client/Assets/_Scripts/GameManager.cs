@@ -197,9 +197,12 @@ public class GameManager : MonoBehaviour
                 break;
             }
         }
-        
-        resultsScreen.SetActive(true);
-        resultsText.text = "You are #" + rank;
+
+        if (players.Count > 1)
+        {
+            resultsScreen.SetActive(true);
+            resultsText.text = "You are #" + rank;
+        }
 
         foreach (int score in scores)
         {
