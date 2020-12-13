@@ -34,7 +34,7 @@ def ConnectionLoop(sock, playersInMatch):
 			if data['command'] == 'connect':
 	
 				if ConfirmPlayerHasConnected(userid, playersInMatch):
-					CreatePlayerGameData(addr, userid, sock)
+					CreatePlayerGameData(addr, userid, sock, playersInMatch)
 
 			elif data['command'] == 'heartbeat':
 				heartbeats[userid] = datetime.now();
@@ -185,7 +185,7 @@ def SetAccountInformation(enteredUsername, addedWins, addedExp):
 
 ############################################### Match Functions
 
-def CreatePlayerGameData(addr, userid, sock):
+def CreatePlayerGameData(addr, userid, sock, playersInMatch):
 	players_lock.acquire()
 	gameData = {}
 
@@ -221,11 +221,15 @@ def CreatePlayerGameData(addr, userid, sock):
 		
 			sock.sendto(bytes(msg, 'utf8'), address)
 
-	# Signal Player to begin game
-	StartGameSignal(sock, addr)
+	if (len(players) == len(playersInMatch)):
+		for player in players.values():
+			address = player['addr']
 
-	print("Players in match: ")
-	print(players)
+			# Signal Player to begin game
+			StartGameSignal(sock, address)
+
+		print("Players in match: ")
+		print(players)
 
 def PlayerGameDataUpdate(data, userid, sock):
 
@@ -346,13 +350,13 @@ def StartMatchLoop(sock, playersJoining, rounds):
 
 ################################################ Test Code
 
-# def main():
-# 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# 	sock.bind(('', 12345))
-# 	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
-# 	rounds = 3
+def main():
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	sock.bind(('', 12345))
+	playersJoining = {'Apple':{}, 'Banana':{}, 'Orange':{}}
+	rounds = 3
 
-# 	StartMatchLoop(sock, playersJoining, rounds)
+	StartMatchLoop(sock, playersJoining, rounds)
 
-# if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+   main()

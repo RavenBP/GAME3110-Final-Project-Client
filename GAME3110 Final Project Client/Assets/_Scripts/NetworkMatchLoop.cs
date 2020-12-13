@@ -65,21 +65,30 @@ public class NetworkMatchLoop : MonoBehaviour
     private Queue<Player> playersToAdd; // Temporary variable to add to game
 
     // TODO: REMOVE AFTER INTEGRATION
-    //private void Start()
-    //{
-    //    StartMatchConnection("localhost", matchPort);
-    //}
+    private void Start()
+    {
+        ui.DisableInput();
+        //StartMatchConnection("localhost", matchPort);
+    }
 
     // Start connection to match socket
-    public void StartMatchConnection(string ip, int matchPort)
+    public IEnumerator StartMatchConnection(string ip, int matchPort)
     {
         playersToAdd = new Queue<Player>();
+
+        // Wait until client is initialized
+        while (uid == "")
+        {
+            uid = "Apple";
+            yield return null;
+        }
 
         udp = new UdpClient();
 
         //udp.Connect("3.130.200.122", matchPort);
-        udp.Connect(ip, matchPort);
 
+        udp.Connect(ip, matchPort);
+        
         Message connectionMsg = new Message();
         connectionMsg.command = "connect";
         connectionMsg.uid = uid;
@@ -216,7 +225,11 @@ public class NetworkMatchLoop : MonoBehaviour
         try
         {
             Byte[] sendBytes = Encoding.ASCII.GetBytes(JsonUtility.ToJson(message));
-            udp.Send(sendBytes, sendBytes.Length);
+
+            if (udp.Send(sendBytes, sendBytes.Length) <= 0)
+            {
+                SceneManager.LoadScene("MainMenuScene");
+            }
         }
         catch { }
         return true;

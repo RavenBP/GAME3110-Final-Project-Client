@@ -298,6 +298,9 @@ MonoBehaviour:
   scoreLabel: {fileID: 0}
   solve: {fileID: 0}
   guess: {fileID: 0}
+  guessChar: 0
+  guessSolve: 
+  interactableButtons: []
 --- !u!114 &144945810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,6 +403,51 @@ MonoBehaviour:
   usernameText: {fileID: 593962068}
   winsText: {fileID: 0}
   levelText: {fileID: 1750294494}
+--- !u!1 &472146606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 472146608}
+  - component: {fileID: 472146607}
+  m_Layer: 0
+  m_Name: MatchHelper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &472146607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472146606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f280616fc303b5742a3ef214da15d7d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 12345
+  ipAddress: localhost
+--- !u!4 &472146608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472146606}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.59365565, y: 0.16445434, z: -103.19352}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &593962066
 GameObject:
   m_ObjectHideFlags: 0
