@@ -68,6 +68,7 @@ public class NetworkMatchLoop : MonoBehaviour
     private void Start()
     {
         ui.DisableInput();
+        uid = PlayerInfo.username;
         //StartMatchConnection("localhost", matchPort);
     }
 

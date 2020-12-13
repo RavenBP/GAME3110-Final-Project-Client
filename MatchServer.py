@@ -5,6 +5,7 @@ from _thread import *
 import threading
 from datetime import datetime
 import json
+import requests
 
 players = {}
 players_lock = threading.Lock()
@@ -157,7 +158,7 @@ def ProcessResults():
 		
 		for player in players.values():
 			addedWins = 0
-			addExp = 0
+			addedExp = 0
 
 			totalScore = player['cumulativeScore']
 
@@ -175,13 +176,23 @@ def ProcessResults():
 
 	print(scores)
 
-#Replace with actual function
+# Lambda Function for setting Account Information
 def SetAccountInformation(enteredUsername, addedWins, addedExp):
-	print("REPLACE ME")
+    # Get existing wins/exp
+    resp = requests.get("https://zkh251iic9.execute-api.us-east-1.amazonaws.com/default/GetAccount?username=" + enteredUsername)
+    respBody = json.loads(resp.content)
+    existingWins = respBody['numWins']
+    existingExp = respBody['exp']
 
-	print("User " + str(enteredUsername) + " Results: ")
-	print(str(addedWins) + " Wins")
-	print(str(addedExp) + " Exp")
+    # Convert string to int, may be better to return a different type through the lambda function...
+    existingWins = int(existingWins)
+    existingExp = int(existingExp)
+
+    baseUrl = "https://41afs1awpk.execute-api.us-east-1.amazonaws.com/default/SetAccount"
+    endpoint = "?username=" + enteredUsername + "&nwins=" + str(existingWins + addedWins) + "&xp=" + str(existingExp + addedExp)
+    resp = requests.get(baseUrl + endpoint) # Maybe something other than get would be better here...
+
+    print('Account information updated')
 
 ############################################### Match Functions
 
