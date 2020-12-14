@@ -110,7 +110,6 @@ public class GameManager : MonoBehaviour
         }
         catch
         {
-            SceneManager.LoadScene("MainMenuScene");
             return false;
         }
     }
