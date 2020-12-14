@@ -45,6 +45,7 @@ public class NetworkMan : MonoBehaviour
     public class Message
     {
         public commands cmd;
+        public int matchPort;
     }
 
     [Serializable]
@@ -156,6 +157,8 @@ public class NetworkMan : MonoBehaviour
                     }
                     break;
                 case commands.STARTMATCH:
+                    MatchHelper.Instance.port = JsonUtility.FromJson<Message>(returnData).matchPort;
+
                     break;
                 default:
                     Debug.Log("Error");
