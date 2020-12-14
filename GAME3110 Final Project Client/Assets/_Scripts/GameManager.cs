@@ -51,6 +51,9 @@ public class GameManager : MonoBehaviour
     public int spinResult;
     public bool hasRoundEnded = false; // Safety at the end of each round to make sure everyone is safe to proceed
 
+    public GameObject resultsScreen;
+    public TMP_Text resultsText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -101,7 +104,15 @@ public class GameManager : MonoBehaviour
 
     public bool CheckHasTurn()
     {
-        return clientPlayer.id == currentPlayer;
+        try
+        {
+            return clientPlayer.id == currentPlayer;
+        }
+        catch
+        {
+            SceneManager.LoadScene("MainMenuScene");
+            return false;
+        }
     }
 
     // Hand turn to next player in list
@@ -168,6 +179,38 @@ public class GameManager : MonoBehaviour
 
     IEnumerator CloseMatch()
     {
+        List<int> scores = new List<int>();
+
+        foreach (PlayerBehaviour player in players)
+        {
+            scores.Add(player.cumulativeScore);
+        }
+
+        scores.Sort((x, y) => y.CompareTo(x));
+
+        int rank = 0;
+        for (int i = 0; i < scores.Count; i++)
+        {
+            if (clientPlayer.cumulativeScore == scores[i])
+            {
+                rank = i + 1;
+                break;
+            }
+        }
+
+        if (players.Count > 1)
+        {
+            resultsScreen.SetActive(true);
+            resultsText.text = "You are #" + rank;
+        }
+
+        foreach (int score in scores)
+        {
+            Debug.Log(score);
+        }
+
+        Debug.Log("You are #" + rank);
+
         display.gameObject.SetActive(false);  
 
         NetworkMatchLoop.Instance.SendGameUpdate(true);

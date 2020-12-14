@@ -445,13 +445,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   errorText: {fileID: 0}
-  tmpInputField: {fileID: 0}
+  tmpInputField1: {fileID: 0}
+  tmpInputField2: {fileID: 0}
   tmpSolveField: {fileID: 0}
   display: {fileID: 0}
   submitButton: {fileID: 0}
   scoreLabel: {fileID: 0}
   solve: {fileID: 0}
   guess: {fileID: 0}
+  guessChar: 0
+  guessSolve: 
+  interactableButtons: []
 --- !u!114 &206473346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1651,7 +1655,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 206473345}
         m_TargetAssemblyTypeName: UI, Assembly-CSharp
-        m_MethodName: LoadMainMenuScene
+        m_MethodName: LoadMainMenuSceneButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -5,6 +5,7 @@ from _thread import *
 import threading
 from datetime import datetime
 import json
+import requests
 
 players = {}
 players_lock = threading.Lock()
@@ -34,7 +35,7 @@ def ConnectionLoop(sock, playersInMatch):
 			if data['command'] == 'connect':
 	
 				if ConfirmPlayerHasConnected(userid, playersInMatch):
-					CreatePlayerGameData(addr, userid, sock)
+					CreatePlayerGameData(addr, userid, sock, playersInMatch)
 
 			elif data['command'] == 'heartbeat':
 				heartbeats[userid] = datetime.now();
@@ -157,7 +158,7 @@ def ProcessResults():
 		
 		for player in players.values():
 			addedWins = 0
-			addExp = 0
+			addedExp = 0
 
 			totalScore = player['cumulativeScore']
 
@@ -175,17 +176,27 @@ def ProcessResults():
 
 	print(scores)
 
-#Replace with actual function
+# Lambda Function for setting Account Information
 def SetAccountInformation(enteredUsername, addedWins, addedExp):
-	print("REPLACE ME")
+    # Get existing wins/exp
+    resp = requests.get("https://zkh251iic9.execute-api.us-east-1.amazonaws.com/default/GetAccount?username=" + enteredUsername)
+    respBody = json.loads(resp.content)
+    existingWins = respBody['numWins']
+    existingExp = respBody['exp']
 
-	print("User " + str(enteredUsername) + " Results: ")
-	print(str(addedWins) + " Wins")
-	print(str(addedExp) + " Exp")
+    # Convert string to int, may be better to return a different type through the lambda function...
+    existingWins = int(existingWins)
+    existingExp = int(existingExp)
+
+    baseUrl = "https://41afs1awpk.execute-api.us-east-1.amazonaws.com/default/SetAccount"
+    endpoint = "?username=" + enteredUsername + "&nwins=" + str(existingWins + addedWins) + "&xp=" + str(existingExp + addedExp)
+    resp = requests.get(baseUrl + endpoint) # Maybe something other than get would be better here...
+
+    print('Account information updated')
 
 ############################################### Match Functions
 
-def CreatePlayerGameData(addr, userid, sock):
+def CreatePlayerGameData(addr, userid, sock, playersInMatch):
 	players_lock.acquire()
 	gameData = {}
 
@@ -221,11 +232,15 @@ def CreatePlayerGameData(addr, userid, sock):
 		
 			sock.sendto(bytes(msg, 'utf8'), address)
 
-	# Signal Player to begin game
-	StartGameSignal(sock, addr)
+	if (len(players) == len(playersInMatch)):
+		for player in players.values():
+			address = player['addr']
 
-	print("Players in match: ")
-	print(players)
+			# Signal Player to begin game
+			StartGameSignal(sock, address)
+
+		print("Players in match: ")
+		print(players)
 
 def PlayerGameDataUpdate(data, userid, sock):
 
@@ -349,7 +364,7 @@ def StartMatchLoop(sock, playersJoining, rounds):
 def main():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	sock.bind(('', 12345))
-	playersJoining = {'Alpha':{}, 'Beta':{}, 'Gamma':{}}
+	playersJoining = {'Apple':{}, 'Banana':{}, 'Orange':{}}
 	rounds = 3
 
 	StartMatchLoop(sock, playersJoining, rounds)

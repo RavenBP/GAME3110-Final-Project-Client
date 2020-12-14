@@ -67,17 +67,27 @@ public class NetworkMatchLoop : MonoBehaviour
     // TODO: REMOVE AFTER INTEGRATION
     private void Start()
     {
-        StartMatchConnection("localhost", matchPort);
+        ui.DisableInput();
+        //StartMatchConnection("localhost", matchPort);
     }
 
     // Start connection to match socket
-    public void StartMatchConnection(string ip, int matchPort)
+    public IEnumerator StartMatchConnection(string ip, int matchPort)
     {
         playersToAdd = new Queue<Player>();
+
+        // Wait until client is initialized
+        while (uid == "")
+        {
+            //uid = "Apple";
+            uid = PlayerInfo.username;
+            yield return null;
+        }
 
         udp = new UdpClient();
 
         //udp.Connect("3.130.200.122", matchPort);
+
         udp.Connect(ip, matchPort);
 
         Message connectionMsg = new Message();
@@ -170,7 +180,7 @@ public class NetworkMatchLoop : MonoBehaviour
 
     public void CloseConnection()
     {
-        socket.Close();
+
     }
 
     void ProcessUpdateMessage(Player playerUpdate)
