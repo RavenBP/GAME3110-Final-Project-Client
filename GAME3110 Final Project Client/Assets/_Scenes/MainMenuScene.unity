@@ -737,7 +737,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   port: 12345
-  ipAddress: localhost
+  ipAddress: 3.130.200.122
 --- !u!4 &612745821
 Transform:
   m_ObjectHideFlags: 0

@@ -22,7 +22,7 @@ public class MatchHelper : MonoBehaviour
     }
 
     public int port = 12345;
-    public string ipAddress = "localhost";
+    public string ipAddress = "3.130.200.122";
 
     private void Start()
     {
